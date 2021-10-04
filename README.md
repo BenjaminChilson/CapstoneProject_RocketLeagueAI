@@ -1,1 +1,1 @@
-# CapstoneProject_Rocket_League_AI
+# CapstoneProject_RocketLeagueAI
