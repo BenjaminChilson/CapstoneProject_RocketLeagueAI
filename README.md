@@ -31,6 +31,9 @@ measure its fitness with various in-game measurements such as scoring goals or p
 >I am a senior Computer Science major. I will be graduating this next Spring. My interests include AI and game development. I have an interest in Rocket League and have thought about the possibilities of AI such as neural networks with Rocket League.
 
 ### Mentors:
+**Gary McKenzie** - Gary is our current capstone professor. He was chosen for our project because of his master’s degree in computer science and his knowledge in supervised machine learning.
+
+**Yi Shang** (pending) - Professor Shang teaches a class about artificial intelligence. He has published over 200 papers with topics including artificial intelligence and bioinformatics and has a technical focus in Artificial Intelligence and Bioinformatics.
 <br>
 
 ## **Requirements Analysis**
