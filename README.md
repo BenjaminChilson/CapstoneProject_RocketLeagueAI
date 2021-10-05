@@ -1,6 +1,5 @@
 # CapstoneProject_RocketLeagueAI
 ## **Project Introduction**
-___
 ### Who We Are:
 >Our team is titled CarBall AI and we are a team of senior level undergraduate computer
 science students at the University of Missouri. We all share an interest in video games and wish to learn more about artificial intelligence. Our goal with this project is to explore various machine learning and artificial intelligence algorithms and become more knowledgeable in that area of computer science. To accomplish this we are challenging ourselves to create an artificial intelligence that can play the video game Rocket League at a highly skilled level, continually learning and improving its skills through training and experimentation.
@@ -13,7 +12,6 @@ measure its fitness with various in-game measurements such as scoring goals or p
 <br>
 
 ## **Team Information**
-___
 ### Mission Statement:
 >Our team is CarBall AI and our focus with this project is to develop our skills and knowledge in testing and selecting artificial intelligence algorithms. To accomplish this task we will challenge ourselves to build an artificial intelligence that can increasingly become more skilled at playing the game Rocket League. This project will involve analyzing various artificial intelligence algorithms and using those analysis to adjust training parameters.
 ### Team Biographies:
@@ -36,7 +34,6 @@ ___
 <br>
 
 ## **Requirements Analysis**
-___
 ### Hardware Requirements:
 >#### **Rocket league minimum requirements**  
 >- OS: Windows 7 (64 bit) or Newer (64 bit) Windows OS  
