@@ -12,7 +12,7 @@ Our group plans to use AI to learn how to play Rocket League. We would like to u
 
 ## **Team Information**
 ### Mission Statement:
-    Our team is *CarBall AI* and our focus with this project is to develop our skills and knowledge in testing and selecting artificial intelligence algorithms. To accomplish this task we will challenge ourselves to build an artificial intelligence that can increasingly become more skilled at playing the game Rocket League. This project will involve analyzing various artificial intelligence algorithms and using those analysis to adjust training parameters.
+Our team is *CarBall AI* and our focus with this project is to develop our skills and knowledge in testing and selecting artificial intelligence algorithms. To accomplish this task we will challenge ourselves to build an artificial intelligence that can increasingly become more skilled at playing the game Rocket League. This project will involve analyzing various artificial intelligence algorithms and using those analysis to adjust training parameters.
 ### Team Biographies:
 **Michael Branstetter**  
 I am a computer science major minoring in math and I will be graduating May 2022. I’m interested in game development, so this project is a perfect fit. I don’t have too much knowledge on AI or Rocket League, but I’m looking forward to learning about both in this project.
