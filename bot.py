@@ -25,18 +25,12 @@ agent = DQNAgent(state_size, action_size)
 
 for e in range(episode_size):
   state = env.reset()
-  print(state[0])
-  print(state)
-#   state = np.reshape(state, [1, state_size])
-  print(state)
+  
   episode_done = False
   while not episode_done:
     action = agent.act(state)
-    # print(state)
-    print(action)
+    
     next_state, reward, episode_done, _ = env.step(action)
-
-    # next_state = np.reshape(next_state, [1, next_state])
 
     agent.remember(state, action, reward, next_state, episode_done)
 

@@ -52,7 +52,7 @@ class DQNAgent:
       #jump, boost, brake
       for i in range(0, 3):
         action_list.append(np.random.random_integers(0, 1))
-      interpretpted_action_set = self.interperet_action_list(action_list, state)
+      interpretpted_action_set = self.interperet_shortened_action_list(action_list, state)
       # print("ias: {}".format(interpretpted_action_set))
       return interpretpted_action_set
 
@@ -65,7 +65,7 @@ class DQNAgent:
       # print(np.argmax(predictions))
       action_set_index = np.argmax(predictions)
       action_set = self.possible_action_sets[action_set_index]
-      interpretpted_action_set = self.interperet_action_list(action_set, state)
+      interpretpted_action_set = self.interperet_shortened_action_list(action_set, state)
       return interpretpted_action_set
 
   def replay(self, batch_size):
@@ -96,60 +96,58 @@ class DQNAgent:
   def save(self, name):
     self.model.save_weights(name)
 
-  def interperet_action_list(self, action_list, state):
+  def interperet_shortened_action_list(self, shortened_action_set, state):
     # print("given action list: {}".format(action_list))
-    final_action_list = np.ndarray((1, 8))
+    interpreted_action_set = []
 
     car_on_ground = state[15]
     car_in_air = not car_on_ground
     #Action List
     #throttle, steering, jump, roll, brake
     
-    #RLGym action parser
-    #throttle, steer, yaw, pitch, roll, jump, boost, handbrake
     if car_on_ground:
-      # print("car on ground")
       #copy over values for throttle and steering
       for i in range(0, 2):
-        np.put(final_action_list[0], i, action_list[i])
+        interpreted_action_set.append(shortened_action_set[i])
       #yaw, pitch, and roll cannot be adjusted when car is on ground
       for i in range (2, 5):
-        np.put(final_action_list[0], i, 0)
+        interpreted_action_set.append(0)
       #copy over values for jump, boost, and handbrake
-      for i in range (5, 8):
-        np.put(final_action_list[0], i, action_list[i - 3])
-      return final_action_list
+      for i in range (2, 5):
+        interpreted_action_set.append(shortened_action_set[i])
+      
+      return interpreted_action_set
 
     elif car_in_air:
-      # print("car in air")
+      roll_activated = shortened_action_set[4] == 1
+      roll_not_activated = not roll_activated
+
       #throttle and steer are 0
       for i in range(0, 2):
-        np.put(final_action_list[0], i, 0)
+        interpreted_action_set.append(0)
       #roll is activated, use steering value to control roll
       #yaw cannot be altered when rolling
       #copy throttle to control pitch
       #copy steering to control roll
-      if action_list[4] == 1:
-        np.put(final_action_list[0], 2, 0)
-        np.put(final_action_list[0], 3, action_list[0])
-        np.put(final_action_list[0], 4, action_list[1])
+      if roll_activated:
+        interpreted_action_set.append(0)
+        interpreted_action_set.append(shortened_action_set[0])
+        interpreted_action_set.append(shortened_action_set[1])
       #roll is NOT activated
       #copy steering to control yaw
       #copy throttle to control pitch
       #roll cannot be altered when NOT activated
-      else:
-        np.put(final_action_list[0], 2, action_list[1])
-        np.put(final_action_list[0], 3, action_list[0])
-        np.put(final_action_list[0], 4, 0)
+      elif roll_not_activated:
+        interpreted_action_set.append(shortened_action_set[1])
+        interpreted_action_set.append(shortened_action_set[0])
+        interpreted_action_set.append(0)
       #jump and boost match jump and boost values passed in
-      for i in range(5, 7):
-        np.put(final_action_list, i, action_list[i - 3])
+      for i in range(2, 4):
+        interpreted_action_set.append(shortened_action_set[i])
       #handbrake cannot be used while car is not on ground
-      np.put(final_action_list[0], 7, 0)
+      interpreted_action_set.append(0)
 
-      return final_action_list
-    else:
-      print("error getting either car in air or car on ground")
+      return interpreted_action_set
 
   #throttle, steer, yaw, pitch, roll, jump, boost, handbrake
   def decode_action_set(self, action_set):
