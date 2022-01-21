@@ -8,12 +8,18 @@ class OurObsBuilder(ObsBuilder):
 
   def build_obs(self, player: PlayerData, state: GameState, previous_action: np.ndarray):
     obs = []
-    print(state.ball.position.round(3))
-    obs.extend(state.ball.position.round(3).tolist())
-    obs.extend(state.ball.angular_velocity.tolist())
-    print(player.car_data.position.round(3))
-    obs.extend(player.car_data.position.tolist())
-    obs.extend(player.car_data.angular_velocity.tolist())
-    obs.append(player.on_ground)
+    ball_position = [round(num, 3) for num in state.ball.position.tolist()]
+    obs.extend(ball_position)
+    ball_linear_velocity = [round(num, 3) for num in state.ball.linear_velocity.tolist()]
+    obs.extend(ball_linear_velocity)
+    player_position = [round(num, 3) for num in player.car_data.position.tolist()]
+    obs.extend(player_position)
+    player_yaw = round(player.car_data.yaw(), 6)
+    player_pitch = round(player.car_data.pitch(), 6)
+    player_roll = round(player.car_data.roll(), 6)
+    obs.extend([player_yaw, player_pitch, player_roll])
+    player_linear_velocity = [round(num, 3) for num in player.car_data.linear_velocity.tolist()]
+    obs.extend(player_linear_velocity)
+    obs.append(round(float(player.on_ground), 3))
     
-    return np.asarray(obs)
+    return obs
