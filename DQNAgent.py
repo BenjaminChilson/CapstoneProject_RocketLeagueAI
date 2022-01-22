@@ -4,6 +4,8 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
 from collections import deque
 import random
+import short_action_set_constants as sasc
+import full_action_set_constants as fasc
 # import ActionSets
 
 class DQNAgent:
@@ -97,85 +99,80 @@ class DQNAgent:
     self.model.save_weights(name)
 
   def interperet_shortened_action_list(self, shortened_action_set, state):
-    # print("given action list: {}".format(action_list))
-    interpreted_action_set = []
+    interpreted_action_set = [None] * 8
 
     car_on_ground = state[15]
     car_in_air = not car_on_ground
-    #Action List
-    #throttle, steering, jump, roll, brake
+  
     
     if car_on_ground:
-      #copy over values for throttle and steering
-      for i in range(0, 2):
-        interpreted_action_set.append(shortened_action_set[i])
+      #copy over values for throttle and steer
+      interpreted_action_set[fasc.THROTTLE_INDEX] = shortened_action_set[sasc.FOWARDBACKWARD_INDEX]
+      interpreted_action_set[fasc.STEER_INDEX] = shortened_action_set[sasc.LEFTRIGHT_INDEX]
       #yaw, pitch, and roll cannot be adjusted when car is on ground
-      for i in range (2, 5):
-        interpreted_action_set.append(0)
+      interpreted_action_set[fasc.YAW_INDEX] = 0
+      interpreted_action_set[fasc.PITCH_INDEX] = 0
+      interpreted_action_set[fasc.ROLL_INDEX] = 0
       #copy over values for jump, boost, and handbrake
-      for i in range (2, 5):
-        interpreted_action_set.append(shortened_action_set[i])
+      interpreted_action_set[fasc.JUMP_INDEX] = shortened_action_set[sasc.JUMP_INDEX]
+      interpreted_action_set[fasc.BOOST_INDEX] = shortened_action_set[sasc.BOOST_INDEX]
+      interpreted_action_set[fasc.HANDBRAKE_INDEX] = shortened_action_set[sasc.SHIFT_INDEX]
       
       return interpreted_action_set
 
     elif car_in_air:
-      roll_activated = shortened_action_set[4] == 1
+      roll_activated = shortened_action_set[sasc.SHIFT_INDEX] == 1
       roll_not_activated = not roll_activated
 
-      #throttle and steer are 0
-      for i in range(0, 2):
-        interpreted_action_set.append(0)
-      #roll is activated, use steering value to control roll
-      #yaw cannot be altered when rolling
-      #copy throttle to control pitch
-      #copy steering to control roll
+      #throttle and steer cannot be adjusted when car is in the air, equals 0
+      interpreted_action_set[fasc.THROTTLE_INDEX] = 0
+      interpreted_action_set[fasc.STEER_INDEX] = 0
+      #copy Forward/Back to control pitch
+      interpreted_action_set[fasc.PITCH_INDEX] = shortened_action_set[sasc.FOWARDBACKWARD_INDEX]
+
       if roll_activated:
-        interpreted_action_set.append(0)
-        interpreted_action_set.append(shortened_action_set[0])
-        interpreted_action_set.append(shortened_action_set[1])
-      #roll is NOT activated
-      #copy steering to control yaw
-      #copy throttle to control pitch
-      #roll cannot be altered when NOT activated
+        #yaw cannot be altered when rolling, equals 0
+        interpreted_action_set[fasc.YAW_INDEX] = 0
+        #copy Left/Right value to control roll
+        interpreted_action_set[fasc.ROLL_INDEX] = shortened_action_set[sasc.LEFTRIGHT_INDEX]
+      
       elif roll_not_activated:
-        interpreted_action_set.append(shortened_action_set[1])
-        interpreted_action_set.append(shortened_action_set[0])
-        interpreted_action_set.append(0)
-      #jump and boost match jump and boost values passed in
-      for i in range(2, 4):
-        interpreted_action_set.append(shortened_action_set[i])
-      #handbrake cannot be used while car is not on ground
-      interpreted_action_set.append(0)
+        #copy Left/Right value to control yaw
+        interpreted_action_set[fasc.YAW_INDEX] = shortened_action_set[sasc.LEFTRIGHT_INDEX]
+        #roll cannot be altered when roll is not activated, equals 0
+        interpreted_action_set[fasc.ROLL_INDEX] = 0
+
+      #copy over values for jump and boost
+      interpreted_action_set[fasc.JUMP_INDEX] = shortened_action_set[sasc.JUMP_INDEX]
+      interpreted_action_set[fasc.BOOST_INDEX] = shortened_action_set[sasc.BOOST_INDEX]
+      #handbrake cannot be used while car is not on ground, equals 0
+      interpreted_action_set[fasc.HANDBRAKE_INDEX] = 0
 
       return interpreted_action_set
 
   #throttle, steer, yaw, pitch, roll, jump, boost, handbrake
   def decode_action_set(self, action_set):
-    new_action_set = []
-    decoded_action_set = []
-    action_set = np.reshape(action_set, (1, 8))
-    
-    for i in range(0, 8):
-      new_action_set.append(action_set[0][i])
+    decoded_action_set = [None] * 5
     
     #action_set[0] will be controlling either throttle or pitch
-    for x in (new_action_set[0], new_action_set[3]):
+    for x in (action_set[fasc.THROTTLE_INDEX], action_set[fasc.PITCH_INDEX]):
       if x != 0:
-        decoded_action_set.append(x)
+        decoded_action_set[sasc.FOWARDBACKWARD_INDEX] = x
         break
-    if new_action_set[0] == 0 and new_action_set[3] == 0:
-      decoded_action_set.append(0)
+    if action_set[fasc.THROTTLE_INDEX] == 0 and action_set[fasc.PITCH_INDEX] == 0:
+      decoded_action_set[sasc.FOWARDBACKWARD_INDEX] = 0
+    
     #action_set[1] will be controlling either steering, yaw, or rolling
-    for x in (new_action_set[1], new_action_set[2], new_action_set[4]):
+    for x in (action_set[fasc.STEER_INDEX], action_set[fasc.YAW_INDEX], action_set[fasc.ROLL_INDEX]):
       if x != 0:
-        decoded_action_set.append(x)
+        decoded_action_set[sasc.LEFTRIGHT_INDEX] = x
         break
-    if new_action_set[1] == 0 and new_action_set[2] == 0 and new_action_set[4] == 0:
-      decoded_action_set.append(0)
+    if action_set[fasc.STEER_INDEX] == 0 and action_set[fasc.YAW_INDEX] == 0 and action_set[fasc.ROLL_INDEX] == 0:
+      decoded_action_set[sasc.LEFTRIGHT_INDEX] = 0
 
-    decoded_action_set.append(new_action_set[5])
-    decoded_action_set.append(new_action_set[6])
-    decoded_action_set.append(new_action_set[7])
+    decoded_action_set[sasc.JUMP_INDEX] = action_set[fasc.JUMP_INDEX]
+    decoded_action_set[sasc.BOOST_INDEX] = action_set[fasc.BOOST_INDEX]
+    decoded_action_set[sasc.SHIFT_INDEX] = action_set[fasc.HANDBRAKE_INDEX]
 
     return decoded_action_set
     
