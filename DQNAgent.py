@@ -36,8 +36,6 @@ class DQNAgent:
     
     model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
 
-
-
     return model
 
   def remember(self, state, action, reward, next_state, done):
@@ -62,9 +60,6 @@ class DQNAgent:
     else:
       updated_state = np.reshape(state, [1, self.state_size])
       predictions = self.model.predict(updated_state)[0]
-      # print(len(predictions))
-      # print(predictions)
-      # print(np.argmax(predictions))
       action_set_index = np.argmax(predictions)
       action_set = self.possible_action_sets[action_set_index]
       interpretpted_action_set = self.interperet_shortened_action_list(action_set, state)
@@ -98,56 +93,69 @@ class DQNAgent:
   def save(self, name):
     self.model.save_weights(name)
 
+  def interperet_car_on_ground_shortend_action_set(self, shortened_action_set, interpreted_action_set):
+    interpreted_action_set = [None] * 8
+
+    #copy over values for throttle and steer
+    interpreted_action_set[fasc.THROTTLE_INDEX] = shortened_action_set[sasc.FOWARDBACKWARD_INDEX]
+    interpreted_action_set[fasc.STEER_INDEX] = shortened_action_set[sasc.LEFTRIGHT_INDEX]
+    #yaw, pitch, and roll cannot be adjusted when car is on ground
+    interpreted_action_set[fasc.YAW_INDEX] = 0
+    interpreted_action_set[fasc.PITCH_INDEX] = 0
+    interpreted_action_set[fasc.ROLL_INDEX] = 0
+    #copy over values for jump, boost, and handbrake
+    interpreted_action_set[fasc.JUMP_INDEX] = shortened_action_set[sasc.JUMP_INDEX]
+    interpreted_action_set[fasc.BOOST_INDEX] = shortened_action_set[sasc.BOOST_INDEX]
+    interpreted_action_set[fasc.HANDBRAKE_INDEX] = shortened_action_set[sasc.SHIFT_INDEX]
+
+    return interpreted_action_set
+
+  def interperet_car_in_air_shortend_action_set(self, shortened_action_set):
+    interpreted_action_set = [None] * 8
+    
+    roll_activated = shortened_action_set[sasc.SHIFT_INDEX] == 1
+    roll_not_activated = not roll_activated
+
+    #throttle and steer cannot be adjusted when car is in the air, equals 0
+    interpreted_action_set[fasc.THROTTLE_INDEX] = 0
+    interpreted_action_set[fasc.STEER_INDEX] = 0
+    #copy Forward/Back to control pitch
+    interpreted_action_set[fasc.PITCH_INDEX] = shortened_action_set[sasc.FOWARDBACKWARD_INDEX]
+
+    if roll_activated:
+      #yaw cannot be altered when rolling, equals 0
+      interpreted_action_set[fasc.YAW_INDEX] = 0
+      #copy Left/Right value to control roll
+      interpreted_action_set[fasc.ROLL_INDEX] = shortened_action_set[sasc.LEFTRIGHT_INDEX]
+    
+    elif roll_not_activated:
+      #copy Left/Right value to control yaw
+      interpreted_action_set[fasc.YAW_INDEX] = shortened_action_set[sasc.LEFTRIGHT_INDEX]
+      #roll cannot be altered when roll is not activated, equals 0
+      interpreted_action_set[fasc.ROLL_INDEX] = 0
+
+    #copy over values for jump and boost
+    interpreted_action_set[fasc.JUMP_INDEX] = shortened_action_set[sasc.JUMP_INDEX]
+    interpreted_action_set[fasc.BOOST_INDEX] = shortened_action_set[sasc.BOOST_INDEX]
+    #handbrake cannot be used while car is not on ground, equals 0
+    interpreted_action_set[fasc.HANDBRAKE_INDEX] = 0
+
+    return interpreted_action_set
+
+
   def interperet_shortened_action_list(self, shortened_action_set, state):
     interpreted_action_set = [None] * 8
 
     car_on_ground = state[15]
     car_in_air = not car_on_ground
-  
     
     if car_on_ground:
-      #copy over values for throttle and steer
-      interpreted_action_set[fasc.THROTTLE_INDEX] = shortened_action_set[sasc.FOWARDBACKWARD_INDEX]
-      interpreted_action_set[fasc.STEER_INDEX] = shortened_action_set[sasc.LEFTRIGHT_INDEX]
-      #yaw, pitch, and roll cannot be adjusted when car is on ground
-      interpreted_action_set[fasc.YAW_INDEX] = 0
-      interpreted_action_set[fasc.PITCH_INDEX] = 0
-      interpreted_action_set[fasc.ROLL_INDEX] = 0
-      #copy over values for jump, boost, and handbrake
-      interpreted_action_set[fasc.JUMP_INDEX] = shortened_action_set[sasc.JUMP_INDEX]
-      interpreted_action_set[fasc.BOOST_INDEX] = shortened_action_set[sasc.BOOST_INDEX]
-      interpreted_action_set[fasc.HANDBRAKE_INDEX] = shortened_action_set[sasc.SHIFT_INDEX]
+      interpreted_action_set = self.interperet_car_on_ground_shortend_action_set(shortened_action_set, interpreted_action_set)
       
       return interpreted_action_set
 
     elif car_in_air:
-      roll_activated = shortened_action_set[sasc.SHIFT_INDEX] == 1
-      roll_not_activated = not roll_activated
-
-      #throttle and steer cannot be adjusted when car is in the air, equals 0
-      interpreted_action_set[fasc.THROTTLE_INDEX] = 0
-      interpreted_action_set[fasc.STEER_INDEX] = 0
-      #copy Forward/Back to control pitch
-      interpreted_action_set[fasc.PITCH_INDEX] = shortened_action_set[sasc.FOWARDBACKWARD_INDEX]
-
-      if roll_activated:
-        #yaw cannot be altered when rolling, equals 0
-        interpreted_action_set[fasc.YAW_INDEX] = 0
-        #copy Left/Right value to control roll
-        interpreted_action_set[fasc.ROLL_INDEX] = shortened_action_set[sasc.LEFTRIGHT_INDEX]
-      
-      elif roll_not_activated:
-        #copy Left/Right value to control yaw
-        interpreted_action_set[fasc.YAW_INDEX] = shortened_action_set[sasc.LEFTRIGHT_INDEX]
-        #roll cannot be altered when roll is not activated, equals 0
-        interpreted_action_set[fasc.ROLL_INDEX] = 0
-
-      #copy over values for jump and boost
-      interpreted_action_set[fasc.JUMP_INDEX] = shortened_action_set[sasc.JUMP_INDEX]
-      interpreted_action_set[fasc.BOOST_INDEX] = shortened_action_set[sasc.BOOST_INDEX]
-      #handbrake cannot be used while car is not on ground, equals 0
-      interpreted_action_set[fasc.HANDBRAKE_INDEX] = 0
-
+      interpreted_action_set = self.interperet_car_in_air_shortend_action_set(shortened_action_set, interpreted_action_set)
       return interpreted_action_set
 
   #throttle, steer, yaw, pitch, roll, jump, boost, handbrake
@@ -175,7 +183,6 @@ class DQNAgent:
     decoded_action_set[sasc.SHIFT_INDEX] = action_set[fasc.HANDBRAKE_INDEX]
 
     return decoded_action_set
-    
 
 
 #{Throttle, Steering, Jump, Boost, Brake/Powerslide}
