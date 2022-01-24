@@ -43,26 +43,17 @@ class DQNAgent:
   def act(self, state):
     #exploration is chosen
     if np.random.rand() <= self.epsilon:
-      # print("Exploration is Chosen")
-      action_list = []
-      #throttle and steer (pitch and yaw)
-      for i in range(0, 2):
-        action_list.append(np.random.random_integers(-1, 1))
-      #jump, boost, brake
-      for i in range(0, 3):
-        action_list.append(np.random.random_integers(0, 1))
-      interpretpted_action_set = self.interperet_shortened_action_list(action_list, state)
-      # print("ias: {}".format(interpretpted_action_set))
-      return interpretpted_action_set
+      control_state_index = np.random.random_integers(0, self.action_size - 1)
+      
+      return control_state_index
 
     #exploitation is chosen
     else:
       updated_state = np.reshape(state, [1, self.state_size])
       predictions = self.model.predict(updated_state)[0]
-      action_set_index = np.argmax(predictions)
-      action_set = self.possible_action_sets[action_set_index]
-      interpretpted_action_set = self.interperet_shortened_action_list(action_set, state)
-      return interpretpted_action_set
+      control_state_index = np.argmax(predictions)
+      
+      return control_state_index
 
   def replay(self, batch_size):
     minibatch = random.sample(self.memory, batch_size)
@@ -77,9 +68,7 @@ class DQNAgent:
         target = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
 
       target_f = self.model.predict(state)
-      action = self.decode_action_set(action)
-      action_index = self.possible_action_sets.index(action)
-      target_f[0][action_index] = target
+      target_f[0][action] = target
 
       self.model.fit(state, target_f, epochs=1, verbose=0)
 
@@ -142,43 +131,17 @@ class DQNAgent:
     return interpreted_action_set
 
 
-  def interperet_shortened_action_list(self, shortened_action_set, state):
-    interpreted_action_set = [None] * 8
+  def interperet_control_state(self, control_state, game_state):
+    interpreted_control_state = [None] * 8
 
-    car_on_ground = state[15]
+    car_on_ground = game_state[15]
     car_in_air = not car_on_ground
     
     if car_on_ground:
-      interpreted_action_set = self.interperet_car_on_ground_shortend_action_set(shortened_action_set, interpreted_action_set)
+      interpreted_control_state = self.interperet_car_on_ground_shortend_action_set(control_state, interpreted_control_state)
       
-      return interpreted_action_set
+      return interpreted_control_state
 
     elif car_in_air:
-      interpreted_action_set = self.interperet_car_in_air_shortend_action_set(shortened_action_set, interpreted_action_set)
-      return interpreted_action_set
-
-  #throttle, steer, yaw, pitch, roll, jump, boost, handbrake
-  def decode_action_set(self, action_set):
-    decoded_action_set = [None] * 5
-    
-    #action_set[0] will be controlling either throttle or pitch
-    for x in (action_set[fasc.THROTTLE_INDEX], action_set[fasc.PITCH_INDEX]):
-      if x != 0:
-        decoded_action_set[cs.FOWARDBACKWARD_INDEX] = x
-        break
-    if action_set[fasc.THROTTLE_INDEX] == 0 and action_set[fasc.PITCH_INDEX] == 0:
-      decoded_action_set[cs.FOWARDBACKWARD_INDEX] = 0
-    
-    #action_set[1] will be controlling either steering, yaw, or rolling
-    for x in (action_set[fasc.STEER_INDEX], action_set[fasc.YAW_INDEX], action_set[fasc.ROLL_INDEX]):
-      if x != 0:
-        decoded_action_set[cs.LEFTRIGHT_INDEX] = x
-        break
-    if action_set[fasc.STEER_INDEX] == 0 and action_set[fasc.YAW_INDEX] == 0 and action_set[fasc.ROLL_INDEX] == 0:
-      decoded_action_set[cs.LEFTRIGHT_INDEX] = 0
-
-    decoded_action_set[cs.JUMP_INDEX] = action_set[fasc.JUMP_INDEX]
-    decoded_action_set[cs.BOOST_INDEX] = action_set[fasc.BOOST_INDEX]
-    decoded_action_set[cs.SHIFT_INDEX] = action_set[fasc.HANDBRAKE_INDEX]
-
-    return decoded_action_set
+      interpreted_control_state = self.interperet_car_in_air_shortend_action_set(control_state, interpreted_control_state)
+      return interpreted_control_state
