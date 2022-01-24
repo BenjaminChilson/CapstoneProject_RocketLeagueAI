@@ -10,9 +10,7 @@ JUMP_INDEX = 2
 BOOST_INDEX = 3
 SHIFT_INDEX = 4
 
-
-
-control_states = [
+controller_states = [
     [0, 0, 0, 0, 0],
     [0, 0, 0, 0, 1],
     [0, 0, 0, 1, 0],
@@ -94,4 +92,4 @@ control_states = [
     [-1, 1, 1, 1, 0],
     [-1, 1, 1, 1, 1]]
 
-CONTROL_STATES_COUNT = len(control_states)
+CONTROL_STATES_COUNT = len(controller_states)

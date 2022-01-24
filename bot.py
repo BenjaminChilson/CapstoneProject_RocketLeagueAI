@@ -7,7 +7,7 @@ import os
 from rlgym.utils.terminal_conditions.common_conditions import GoalScoredCondition, TimeoutCondition
 from rlgym.utils.reward_functions.common_rewards import VelocityBallToGoalReward, BallYCoordinateReward, EventReward
 from OurObsBuilder import OurObsBuilder
-import control_states as cs
+import controller_states as cs
 
 print("hello...")
 
@@ -29,7 +29,7 @@ for e in range(episode_size):
   episode_done = False
   while not episode_done:
     action_index = agent.act(state)
-    action = agent.interperet_control_state(cs.control_states[action_index], state)
+    action = agent.interperet_control_state(cs.controller_states[action_index], state)
     
     next_state, reward, episode_done, _ = env.step(action)
 

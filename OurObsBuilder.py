@@ -3,6 +3,9 @@ from rlgym.utils.gamestates import PlayerData, GameState
 import numpy as np
 
 class OurObsBuilder(ObsBuilder):
+
+  CAR_ON_GROUND_INDEX = 15
+
   def reset(self, initial_state: GameState):
     pass
 
