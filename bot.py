@@ -14,7 +14,7 @@ print("hello...")
 env = rlgym.make(obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), TimeoutCondition(1000)], reward_fn=EventReward(goal=1000, concede=-1000, touch=200, shot=700, save=300))
 print("make command should be executed now")
 state_size = 16
-action_size = 72
+action_size = cs.CONTROL_STATES_COUNT
 
 batch_size = 32
 episode_size = 100
@@ -29,11 +29,11 @@ for e in range(episode_size):
   episode_done = False
   while not episode_done:
     action_index = agent.act(state)
-    action = cs.control_states[action_index]
+    action = agent.interperet_control_state(cs.control_states[action_index], state)
     
     next_state, reward, episode_done, _ = env.step(action)
 
-    agent.remember(state, action, reward, next_state, episode_done)
+    agent.remember(state, action_index, reward, next_state, episode_done)
 
     state = next_state
   
