@@ -7,7 +7,6 @@ import os
 from rlgym.utils.terminal_conditions.common_conditions import GoalScoredCondition, TimeoutCondition
 from rlgym.utils.reward_functions.common_rewards import VelocityBallToGoalReward, BallYCoordinateReward, EventReward
 from OurObsBuilder import OurObsBuilder
-from ActionSets import possible_action_sets
 
 print("hello...")
 

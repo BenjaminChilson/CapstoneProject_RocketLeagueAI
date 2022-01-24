@@ -4,9 +4,8 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
 from collections import deque
 import random
-import short_action_set_constants as sasc
+import control_states as cs
 import full_action_set_constants as fasc
-# import ActionSets
 
 class DQNAgent:
   def __init__(self, state_size, action_size):
@@ -97,46 +96,46 @@ class DQNAgent:
     interpreted_action_set = [None] * 8
 
     #copy over values for throttle and steer
-    interpreted_action_set[fasc.THROTTLE_INDEX] = shortened_action_set[sasc.FOWARDBACKWARD_INDEX]
-    interpreted_action_set[fasc.STEER_INDEX] = shortened_action_set[sasc.LEFTRIGHT_INDEX]
+    interpreted_action_set[fasc.THROTTLE_INDEX] = shortened_action_set[cs.FOWARDBACKWARD_INDEX]
+    interpreted_action_set[fasc.STEER_INDEX] = shortened_action_set[cs.LEFTRIGHT_INDEX]
     #yaw, pitch, and roll cannot be adjusted when car is on ground
     interpreted_action_set[fasc.YAW_INDEX] = 0
     interpreted_action_set[fasc.PITCH_INDEX] = 0
     interpreted_action_set[fasc.ROLL_INDEX] = 0
     #copy over values for jump, boost, and handbrake
-    interpreted_action_set[fasc.JUMP_INDEX] = shortened_action_set[sasc.JUMP_INDEX]
-    interpreted_action_set[fasc.BOOST_INDEX] = shortened_action_set[sasc.BOOST_INDEX]
-    interpreted_action_set[fasc.HANDBRAKE_INDEX] = shortened_action_set[sasc.SHIFT_INDEX]
+    interpreted_action_set[fasc.JUMP_INDEX] = shortened_action_set[cs.JUMP_INDEX]
+    interpreted_action_set[fasc.BOOST_INDEX] = shortened_action_set[cs.BOOST_INDEX]
+    interpreted_action_set[fasc.HANDBRAKE_INDEX] = shortened_action_set[cs.SHIFT_INDEX]
 
     return interpreted_action_set
 
   def interperet_car_in_air_shortend_action_set(self, shortened_action_set):
     interpreted_action_set = [None] * 8
     
-    roll_activated = shortened_action_set[sasc.SHIFT_INDEX] == 1
+    roll_activated = shortened_action_set[cs.SHIFT_INDEX] == 1
     roll_not_activated = not roll_activated
 
     #throttle and steer cannot be adjusted when car is in the air, equals 0
     interpreted_action_set[fasc.THROTTLE_INDEX] = 0
     interpreted_action_set[fasc.STEER_INDEX] = 0
     #copy Forward/Back to control pitch
-    interpreted_action_set[fasc.PITCH_INDEX] = shortened_action_set[sasc.FOWARDBACKWARD_INDEX]
+    interpreted_action_set[fasc.PITCH_INDEX] = shortened_action_set[cs.FOWARDBACKWARD_INDEX]
 
     if roll_activated:
       #yaw cannot be altered when rolling, equals 0
       interpreted_action_set[fasc.YAW_INDEX] = 0
       #copy Left/Right value to control roll
-      interpreted_action_set[fasc.ROLL_INDEX] = shortened_action_set[sasc.LEFTRIGHT_INDEX]
+      interpreted_action_set[fasc.ROLL_INDEX] = shortened_action_set[cs.LEFTRIGHT_INDEX]
     
     elif roll_not_activated:
       #copy Left/Right value to control yaw
-      interpreted_action_set[fasc.YAW_INDEX] = shortened_action_set[sasc.LEFTRIGHT_INDEX]
+      interpreted_action_set[fasc.YAW_INDEX] = shortened_action_set[cs.LEFTRIGHT_INDEX]
       #roll cannot be altered when roll is not activated, equals 0
       interpreted_action_set[fasc.ROLL_INDEX] = 0
 
     #copy over values for jump and boost
-    interpreted_action_set[fasc.JUMP_INDEX] = shortened_action_set[sasc.JUMP_INDEX]
-    interpreted_action_set[fasc.BOOST_INDEX] = shortened_action_set[sasc.BOOST_INDEX]
+    interpreted_action_set[fasc.JUMP_INDEX] = shortened_action_set[cs.JUMP_INDEX]
+    interpreted_action_set[fasc.BOOST_INDEX] = shortened_action_set[cs.BOOST_INDEX]
     #handbrake cannot be used while car is not on ground, equals 0
     interpreted_action_set[fasc.HANDBRAKE_INDEX] = 0
 
@@ -165,106 +164,21 @@ class DQNAgent:
     #action_set[0] will be controlling either throttle or pitch
     for x in (action_set[fasc.THROTTLE_INDEX], action_set[fasc.PITCH_INDEX]):
       if x != 0:
-        decoded_action_set[sasc.FOWARDBACKWARD_INDEX] = x
+        decoded_action_set[cs.FOWARDBACKWARD_INDEX] = x
         break
     if action_set[fasc.THROTTLE_INDEX] == 0 and action_set[fasc.PITCH_INDEX] == 0:
-      decoded_action_set[sasc.FOWARDBACKWARD_INDEX] = 0
+      decoded_action_set[cs.FOWARDBACKWARD_INDEX] = 0
     
     #action_set[1] will be controlling either steering, yaw, or rolling
     for x in (action_set[fasc.STEER_INDEX], action_set[fasc.YAW_INDEX], action_set[fasc.ROLL_INDEX]):
       if x != 0:
-        decoded_action_set[sasc.LEFTRIGHT_INDEX] = x
+        decoded_action_set[cs.LEFTRIGHT_INDEX] = x
         break
     if action_set[fasc.STEER_INDEX] == 0 and action_set[fasc.YAW_INDEX] == 0 and action_set[fasc.ROLL_INDEX] == 0:
-      decoded_action_set[sasc.LEFTRIGHT_INDEX] = 0
+      decoded_action_set[cs.LEFTRIGHT_INDEX] = 0
 
-    decoded_action_set[sasc.JUMP_INDEX] = action_set[fasc.JUMP_INDEX]
-    decoded_action_set[sasc.BOOST_INDEX] = action_set[fasc.BOOST_INDEX]
-    decoded_action_set[sasc.SHIFT_INDEX] = action_set[fasc.HANDBRAKE_INDEX]
+    decoded_action_set[cs.JUMP_INDEX] = action_set[fasc.JUMP_INDEX]
+    decoded_action_set[cs.BOOST_INDEX] = action_set[fasc.BOOST_INDEX]
+    decoded_action_set[cs.SHIFT_INDEX] = action_set[fasc.HANDBRAKE_INDEX]
 
     return decoded_action_set
-
-
-#{Throttle, Steering, Jump, Boost, Brake/Powerslide}
-#{Pitch,    Yaw,      Jump, Boost, Brake(Roll?)}
-
-  possible_action_sets = [[0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 1],
-  [0, 0, 0, 1, 0],
-  [0, 0, 0, 1, 1],
-  [0, 0, 1, 0, 0],
-  [0, 0, 1, 0, 1],
-  [0, 0, 1, 1, 0],
-  [0, 0, 1, 1, 1],
-
-  [0, 1, 0, 0, 0],
-  [0, 1, 0, 0, 1],
-  [0, 1, 0, 1, 0],
-  [0, 1, 0, 1, 1],
-  [0, 1, 1, 0, 0],
-  [0, 1, 1, 0, 1],
-  [0, 1, 1, 1, 0],
-  [0, 1, 1, 1, 1],
-
-  [1, 0, 0, 0, 0],
-  [1, 0, 0, 0, 1],
-  [1, 0, 0, 1, 0],
-  [1, 0, 0, 1, 1],
-  [1, 0, 1, 0, 0],
-  [1, 0, 1, 0, 1],
-  [1, 0, 1, 1, 0],
-  [1, 0, 1, 1, 1],
-
-  [1, 1, 0, 0, 0],
-  [1, 1, 0, 0, 1],
-  [1, 1, 0, 1, 0],
-  [1, 1, 0, 1, 1],
-  [1, 1, 1, 0, 0],
-  [1, 1, 1, 0, 1],
-  [1, 1, 1, 1, 0],
-  [1, 1, 1, 1, 1],
-
-  [0, -1, 0, 0, 0],
-  [0, -1, 0, 0, 1],
-  [0, -1, 0, 1, 0],
-  [0, -1, 0, 1, 1],
-  [0, -1, 1, 0, 0],
-  [0, -1, 1, 0, 1],
-  [0, -1, 1, 1, 0],
-  [0, -1, 1, 1, 1],
-
-  [-1, 0, 0, 0, 0],
-  [-1, 0, 0, 0, 1],
-  [-1, 0, 0, 1, 0],
-  [-1, 0, 0, 1, 1],
-  [-1, 0, 1, 0, 0],
-  [-1, 0, 1, 0, 1],
-  [-1, 0, 1, 1, 0],
-  [-1, 0, 1, 1, 1],
-
-  [-1, -1, 0, 0, 0],
-  [-1, -1, 0, 0, 1],
-  [-1, -1, 0, 1, 0],
-  [-1, -1, 0, 1, 1],
-  [-1, -1, 1, 0, 0],
-  [-1, -1, 1, 0, 1],
-  [-1, -1, 1, 1, 0],
-  [-1, -1, 1, 1, 1],
-
-  [1, -1, 0, 0, 0],
-  [1, -1, 0, 0, 1],
-  [1, -1, 0, 1, 0],
-  [1, -1, 0, 1, 1],
-  [1, -1, 1, 0, 0],
-  [1, -1, 1, 0, 1],
-  [1, -1, 1, 1, 0],
-  [1, -1, 1, 1, 1],
-
-  [-1, 1, 0, 0, 0],
-  [-1, 1, 0, 0, 1],
-  [-1, 1, 0, 1, 0],
-  [-1, 1, 0, 1, 1],
-  [-1, 1, 1, 0, 0],
-  [-1, 1, 1, 0, 1],
-  [-1, 1, 1, 1, 0],
-  [-1, 1, 1, 1, 1]]
