@@ -10,8 +10,8 @@ from OurObsBuilder import OurObsBuilder
 import controller_states as cs
 import action_sets
 
-env = rlgym.make(obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), TimeoutCondition(1000)], reward_fn=EventReward(goal=1000, concede=-1000, touch=200, shot=700, save=300))
-state_size = 16
+env = rlgym.make(game_speed=1, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), TimeoutCondition(1000)], reward_fn=EventReward(goal=1000, concede=-1000, touch=200, shot=700, save=300))
+state_size = OurObsBuilder.STATE_SIZE
 action_size = cs.CONTROL_STATES_COUNT
 
 batch_size = 32

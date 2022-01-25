@@ -5,6 +5,7 @@ import numpy as np
 class OurObsBuilder(ObsBuilder):
 
   CAR_ON_GROUND_INDEX = 15
+  STATE_SIZE = 17
 
   def reset(self, initial_state: GameState):
     pass
@@ -24,5 +25,6 @@ class OurObsBuilder(ObsBuilder):
     player_linear_velocity = [round(num, 3) for num in player.car_data.linear_velocity.tolist()]
     obs.extend(player_linear_velocity)
     obs.append(round(float(player.on_ground), 3))
+    obs.append(player.boost_amount)
     
     return obs
