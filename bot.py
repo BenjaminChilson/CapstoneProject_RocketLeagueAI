@@ -28,6 +28,12 @@ for e in range(episode_size):
   if not os.path.exists("save/episode{}/".format(e)):
     os.makedirs("save/episode{}/".format(e))
   f = open('save/episode{}/save.csv'.format(e),'a')
+  csv_header = 'TICK,'
+  for word in OurObsBuilder.STATE_TITLES:
+    csv_header += (word + ',')
+    
+  csv_header += 'ACTION INDEX,REWARD'
+  np.savetxt(f, [csv_header], fmt=''.join(['%s']), delimiter=',')
   while not episode_done:
     action_index = agent.act(state)
     action = action_sets.get_action_set_from_controller_state(cs.controller_states[action_index], state)
@@ -35,7 +41,13 @@ for e in range(episode_size):
     next_state, reward, episode_done, _ = env.step(action)
 
     agent.remember(state, action_index, reward, next_state, episode_done)
-    np.savetxt(f, [tick, state, action_index, reward], fmt='%s', delimiter=', ')
+    if (tick % 200 == 0):
+      csv_print_text = []
+      csv_print_text.append(tick)
+      csv_print_text.extend(state)
+      csv_print_text.extend([action_index, reward])
+    
+      np.savetxt(f, [csv_print_text], fmt=''.join(['%s']), delimiter=',')
 
 
     state = next_state
