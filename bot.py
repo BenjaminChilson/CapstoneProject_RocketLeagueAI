@@ -10,7 +10,7 @@ from OurObsBuilder import OurObsBuilder
 import controller_states as cs
 import action_sets
 
-env = rlgym.make(game_speed=1, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), TimeoutCondition(1000)], reward_fn=EventReward(goal=1000, concede=-1000, touch=200, shot=700, save=300))
+env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), TimeoutCondition(1000)], reward_fn=EventReward(goal=1000, concede=-1000, touch=200, shot=700, save=300))
 state_size = OurObsBuilder.STATE_SIZE
 action_size = cs.CONTROL_STATES_COUNT
 
@@ -23,8 +23,11 @@ agent = DQNAgent(state_size, action_size)
 
 for e in range(episode_size):
   state = env.reset()
-  
+  tick = 0
   episode_done = False
+  if not os.path.exists("save/episode{}/".format(e)):
+    os.makedirs("save/episode{}/".format(e))
+  f = open('save/episode{}/save.csv'.format(e),'a')
   while not episode_done:
     action_index = agent.act(state)
     action = action_sets.get_action_set_from_controller_state(cs.controller_states[action_index], state)
@@ -32,11 +35,15 @@ for e in range(episode_size):
     next_state, reward, episode_done, _ = env.step(action)
 
     agent.remember(state, action_index, reward, next_state, episode_done)
+    np.savetxt(f, [tick, state, action_index, reward], fmt='%s', delimiter=', ')
+
 
     state = next_state
   
     if episode_done:
         print("Episode {} complete.\nEpsilon: {}".format(e, agent.epsilon))
+    tick += 1
+  f.close()
   if len(agent.memory) > batch_size:
     agent.replay(batch_size)
 
