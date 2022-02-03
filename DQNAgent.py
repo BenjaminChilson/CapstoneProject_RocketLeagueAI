@@ -81,7 +81,7 @@ class DQNAgent:
   def save_weight_as_csv(self, directory, filename):
     if not os.path.exists(directory):
       os.makedirs(directory)
-    f = open(directory + '/' + filename)
+    f = open(directory + filename, 'a')
     
     preweights = self.model.get_weights()
     w = 0
