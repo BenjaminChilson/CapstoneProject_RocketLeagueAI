@@ -50,18 +50,16 @@ while run == 1:
       state = next_state
 
       total_reward += reward
-    
-      if episode_done:
-        agent.save_weight_as_csv("save/{}/episode/{}/".format(training_timestamp, e), "final_weights.csv")
-        
-        bhf.save_training_results_as_csv(training_timestamp, e, tick, total_reward, start_time)
-        
-        print("Episode {} complete.\nEpsilon: {}".format(e, agent.epsilon))
       
-      tick += 1
+      if episode_done:
+        bhf.save_training_results_as_csv(training_timestamp, e, tick, total_reward, start_time)
+        print("Episode {} complete.\nEpsilon: {}".format(e, agent.epsilon))
 
+      tick += 1
+    
     if len(agent.memory) > batch_size:
       agent.replay(batch_size)
+    agent.save_weight_as_csv("save/{}/episode/{}/".format(training_timestamp, e), "final_weights.csv")
 
   # save weights file after every episodes_size episodes
   agent.save("save/{}/model/end_of_training_weights.hdf5".format(training_timestamp))
