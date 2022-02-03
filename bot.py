@@ -9,6 +9,7 @@ from rlgym.utils.reward_functions.common_rewards import VelocityBallToGoalReward
 from OurObsBuilder import OurObsBuilder
 import controller_states as cs
 import action_sets
+import bot_helper_functions as bhf
 
 env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition()], reward_fn=EventReward(goal=1000, concede=-1000, touch=200, shot=700, save=300))
 state_size = OurObsBuilder.STATE_SIZE
@@ -53,7 +54,7 @@ while run == 1:
       if episode_done:
         agent.save_weight_as_csv("save/{}/episode/{}".format(training_timestamp, e), "final_weights.csv")
         
-        save_training_results_as_csv(training_timestamp, tick, total_reward, start_time)
+        bhf.save_training_results_as_csv(training_timestamp, tick, total_reward, start_time)
         
         print("Episode {} complete.\nEpsilon: {}".format(e, agent.epsilon))
       
@@ -64,14 +65,3 @@ while run == 1:
 
   # save weights file after every episodes_size episodes
   agent.save("save/{}/model/end_of_training_weights.hdf5".format(training_timestamp))
-
-  def save_training_results_as_csv(training_timestamp, ticks, total_reward, start_time):
-    end_time = int(time.time() * 1000.0)
-    if not os.path.exists("save/{}/".format(training_timestamp)):
-      os.makedirs("save/{}/".format(training_timestamp))
-    f = open("save/{}/stats.csv".format(training_timestamp), 'a')
-    stat_titles = ['ticks in episode', 'total reward earned in episode', 'start time', 'end time']
-    np.savetxt(f, [stat_titles], fmt=''.join(['%s']), delimiter=',')
-    stat_values = [ticks, total_reward, start_time, end_time]
-    np.savetxt(f, [stat_values], fmt=''.join(['%s']), delimiter=',')
-    f.close()
