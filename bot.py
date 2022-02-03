@@ -1,5 +1,5 @@
 import rlgym
-import time
+from datetime import datetime
 import numpy as np
 from DQNAgent import DQNAgent
 import random
@@ -24,12 +24,12 @@ run = 1
 while run == 1:
   # structure will be /save/timestamp/episode/#
   # every episode_size amount of episodes, a new timestamp is generated so we don't overwrite files
-  training_timestamp = int(time.time() * 1000.0)
-
+  training_timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+  agent.save_weight_as_csv("save/{}/episode/{}/".format(training_timestamp, 0), "initial_weights.csv")
+  
   # run episodes
   for e in range(episode_size):
-    start_time = int(time.time() * 1000.0)
-    agent.save_weight_as_csv("save/{}/episode/{}/".format(training_timestamp, e), "initial_weights.csv")
+    start_time = datetime.now().strftime("%Y:%m:%d_%H:%M:%S")
     if not os.path.exists("save/{}/model/".format(training_timestamp)):
       os.makedirs("save/{}/model/".format(training_timestamp))
     agent.save("save/{}/model/start_of_training_weights.hdf5".format(training_timestamp))
@@ -52,7 +52,7 @@ while run == 1:
       total_reward += reward
     
       if episode_done:
-        agent.save_weight_as_csv("save/{}/episode/{}".format(training_timestamp, e), "final_weights.csv")
+        agent.save_weight_as_csv("save/{}/episode/{}/".format(training_timestamp, e), "final_weights.csv")
         
         bhf.save_training_results_as_csv(training_timestamp, tick, total_reward, start_time)
         

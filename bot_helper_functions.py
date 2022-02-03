@@ -1,9 +1,9 @@
 import os
 import numpy as np
-import time
+from datetime import datetime
 
 def save_training_results_as_csv(training_timestamp, ticks, total_reward, start_time):
-    end_time = int(time.time() * 1000.0)
+    end_time = datetime.now().strftime("%Y:%m:%d_%H:%M:%S")
     if not os.path.exists("save/{}/".format(training_timestamp)):
       os.makedirs("save/{}/".format(training_timestamp))
     f = open("save/{}/stats.csv".format(training_timestamp), 'a')
