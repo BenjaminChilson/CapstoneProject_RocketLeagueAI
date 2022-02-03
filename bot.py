@@ -33,9 +33,9 @@ while run == 1:
     state = env.reset()
     tick = 0
     episode_done = False
-    if not os.path.exists("save/{}/episode{}/".format(timestamp, e)):
-      os.makedirs("save/{}/episode{}/".format(timestamp, e))
-    f = open('save/{}/episode{}/save.csv'.format(timestamp, e),'a')
+    if not os.path.exists("save/{}/episode{}/".format(timestamp, e + 1)):
+      os.makedirs("save/{}/episode{}/".format(timestamp, e + 1))
+    f = open('save/{}/episode{}/save.csv'.format(timestamp, e + 1),'a')
     csv_header = 'TICK,'
     for word in OurObsBuilder.STATE_TITLES:
       csv_header += (word + ',')
@@ -61,7 +61,7 @@ while run == 1:
       state = next_state
     
       if episode_done:
-          print("Episode {} complete.\nEpsilon: {}".format(e, agent.epsilon))
+          print("Episode {} complete.\nEpsilon: {}".format(e + 1, agent.epsilon))
       tick += 1
     f.close()
     if len(agent.memory) > batch_size:
