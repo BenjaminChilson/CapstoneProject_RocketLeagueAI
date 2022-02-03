@@ -4,6 +4,7 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
 from collections import deque
 import random
+import os
 
 class DQNAgent:
   def __init__(self, state_size, action_size):
@@ -76,3 +77,28 @@ class DQNAgent:
 
   def save(self, name):
     self.model.save_weights(name)
+
+  def save_weight_as_csv(self, directory, filename):
+    if not os.path.exists(directory):
+      os.makedirs(directory)
+    f = open(directory + '/' + filename)
+    
+    preweights = self.model.get_weights()
+    w = 0
+    layernumber = 0
+    while w < len(preweights):
+      layertitle = ["layer" + str(layernumber) + "to" + str(layernumber + 1)]
+      np.savetxt(f, [layertitle], fmt=''.join(['%s']), delimiter=',')
+      currentLayer = preweights[w]
+      i = 0
+      for n in currentLayer:
+        nodeweights = ["node " + str(i)]
+        nodeweights.extend(n)
+        i += 1
+        np.savetxt(f, [nodeweights], fmt=''.join(['%s']), delimiter=',')
+      layer_biases = ["layer " + str(layernumber + 1) + " biases"]
+      layer_biases.extend(preweights[w + 1])
+      np.savetxt(f, [layer_biases], fmt=''.join(['%s']), delimiter=',')
+      layernumber += 1
+      w += 2
+    f.close
