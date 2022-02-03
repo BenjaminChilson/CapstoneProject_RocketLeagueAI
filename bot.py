@@ -17,31 +17,27 @@ action_size = cs.CONTROL_STATES_COUNT
 batch_size = 32
 episode_size = 100
 
-# output_dir = 'model_output/test'
-# if not os.path.exists(output_dir):
-#   os.makedirs(output_dir)
 agent = DQNAgent(state_size, action_size)
 
 run = 1
 while run == 1:
   # structure will be /save/timestamp/episode/#
   # every episode_size amount of episodes, a new timestamp is generated so we don't overwrite files
-  timestamp = int(time.time() * 1000.0)
+  training_timestamp = int(time.time() * 1000.0)
 
   # run episodes
   for e in range(episode_size):
+    start_time = int(time.time() * 1000.0)
+    agent.save_weight_as_csv("save/{}/episode/{}/".format(training_timestamp, e), "initial_weights.csv")
+    if not os.path.exists("save/{}/model/".format(training_timestamp)):
+      os.makedirs("save/{}/model/".format(training_timestamp))
+    agent.save("save/{}/model/start_of_training_weights.hdf5".format(training_timestamp))
+
     state = env.reset()
     tick = 0
+    total_reward = 0
     episode_done = False
-    if not os.path.exists("save/{}/episode{}/".format(timestamp, e)):
-      os.makedirs("save/{}/episode{}/".format(timestamp, e))
-    f = open('save/{}/episode{}/save.csv'.format(timestamp, e),'a')
-    csv_header = 'TICK,'
-    for word in OurObsBuilder.STATE_TITLES:
-      csv_header += (word + ',')
-      
-    csv_header += 'ACTION INDEX,REWARD'
-    np.savetxt(f, [csv_header], fmt=''.join(['%s']), delimiter=',')
+    
     while not episode_done:
       action_index = agent.act(state)
       action = action_sets.get_action_set_from_controller_state(cs.controller_states[action_index], state)
@@ -49,23 +45,33 @@ while run == 1:
       next_state, reward, episode_done, _ = env.step(action)
 
       agent.remember(state, action_index, reward, next_state, episode_done)
-      if (tick % 200 == 0):
-        csv_print_text = []
-        csv_print_text.append(tick)
-        csv_print_text.extend(state)
-        csv_print_text.extend([action_index, reward])
-      
-        np.savetxt(f, [csv_print_text], fmt=''.join(['%s']), delimiter=',')
-
 
       state = next_state
+
+      total_reward += reward
     
       if episode_done:
-          print("Episode {} complete.\nEpsilon: {}".format(e, agent.epsilon))
+        agent.save_weight_as_csv("save/{}/episode/{}".format(training_timestamp, e), "final_weights.csv")
+        
+        save_training_results_as_csv(training_timestamp, tick, total_reward, start_time)
+        
+        print("Episode {} complete.\nEpsilon: {}".format(e, agent.epsilon))
+      
       tick += 1
-    f.close()
+
     if len(agent.memory) > batch_size:
       agent.replay(batch_size)
 
   # save weights file after every episodes_size episodes
-  agent.save("save/{}/model/weights.hdf5".format(timestamp))
+  agent.save("save/{}/model/end_of_training_weights.hdf5".format(training_timestamp))
+
+  def save_training_results_as_csv(training_timestamp, ticks, total_reward, start_time):
+    end_time = int(time.time() * 1000.0)
+    if not os.path.exists("save/{}/".format(training_timestamp)):
+      os.makedirs("save/{}/".format(training_timestamp))
+    f = open("save/{}/stats.csv".format(training_timestamp), 'a')
+    stat_titles = ['ticks in episode', 'total reward earned in episode', 'start time', 'end time']
+    np.savetxt(f, [stat_titles], fmt=''.join(['%s']), delimiter=',')
+    stat_values = [ticks, total_reward, start_time, end_time]
+    np.savetxt(f, [stat_values], fmt=''.join(['%s']), delimiter=',')
+    f.close()
