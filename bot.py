@@ -54,7 +54,7 @@ while run == 1:
       if episode_done:
         agent.save_weight_as_csv("save/{}/episode/{}/".format(training_timestamp, e), "final_weights.csv")
         
-        bhf.save_training_results_as_csv(training_timestamp, tick, total_reward, start_time)
+        bhf.save_training_results_as_csv(training_timestamp, e, tick, total_reward, start_time)
         
         print("Episode {} complete.\nEpsilon: {}".format(e, agent.epsilon))
       
