@@ -6,8 +6,7 @@ import numpy as np
 class OurObsBuilder(ObsBuilder):
 
   CAR_ON_GROUND_INDEX = 15
-  STATE_SIZE = 17
-  STATE_TITLES = ['BALL POS X', 'BALL POS Y', 'BALL POS Z', 'BALL LINE_VEL X', 'BALL LINE_VEL Y', 'BALL LINE_VEL Z', 'PLAYER POS X', 'PLAYER POS Y', 'PLAYER POS Z', 'PLAYER YAW', 'PLAYER PITCH', 'PLAYER ROLL', 'PLAYER LINE_VEL X', 'PLAYER LINE_VEL Y', 'PLAYER LINE_VEL Z', 'ON GROUND', 'BOOST AMOUNT']
+  STATE_SIZE = 18
 
   def reset(self, initial_state: GameState):
     pass
@@ -38,5 +37,6 @@ class OurObsBuilder(ObsBuilder):
     obs.extend(player_linear_velocity)
     obs.append(round(float(player.on_ground), 3))
     obs.append(player.boost_amount)
+    obs.append(player.has_flip)
     
     return obs
