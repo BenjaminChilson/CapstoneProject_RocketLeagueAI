@@ -33,9 +33,9 @@ while run == 1:
   # run episodes
   for e in range(episode_size):
     start_time = datetime.now().strftime("%Y:%m:%d_%H:%M:%S")
-    if not os.path.exists("save/{}/model/".format(training_timestamp)):
+    if not os.path.exists("save/{}/model/start_of_training_weights.hdf5".format(training_timestamp)):
       os.makedirs("save/{}/model/".format(training_timestamp))
-    agent.save("save/{}/model/start_of_training_weights.hdf5".format(training_timestamp))
+      agent.save("save/{}/model/start_of_training_weights.hdf5".format(training_timestamp))
 
     state = env.reset()
     tick = 0
