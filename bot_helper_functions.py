@@ -9,6 +9,6 @@ def save_training_results_as_csv(training_timestamp, episode_number, ticks, tota
     f = open("save/{}/episode/{}/stats.csv".format(training_timestamp, episode_number), 'a')
     stat_titles = ['ticks in episode', 'total reward earned in episode', 'start time', 'end time']
     np.savetxt(f, [stat_titles], fmt=''.join(['%s']), delimiter=',')
-    stat_values = [ticks, total_reward, start_time, end_time]
+    stat_values = [ticks + 1, total_reward, start_time, end_time]
     np.savetxt(f, [stat_values], fmt=''.join(['%s']), delimiter=',')
     f.close()
