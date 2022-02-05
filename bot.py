@@ -4,14 +4,17 @@ import numpy as np
 from DQNAgent import DQNAgent
 import random
 import os
-from rlgym.utils.terminal_conditions.common_conditions import GoalScoredCondition, TimeoutCondition
-from rlgym.utils.reward_functions.common_rewards import VelocityBallToGoalReward, BallYCoordinateReward, EventReward
+from rlgym.utils.terminal_conditions.common_conditions import GoalScoredCondition, NoTouchTimeoutCondition
+from rlgym.utils.reward_functions.common_rewards import VelocityBallToGoalReward, BallYCoordinateReward, EventReward, RewardIfBehindBall
+from rlgym.utils.reward_functions.combined_reward import CombinedReward
 from OurObsBuilder import OurObsBuilder
+from GroupRewardFunction import GroupRewardFunction
 import controller_states as cs
 import action_sets
 import bot_helper_functions as bhf
 
-env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition()], reward_fn=EventReward(goal=1000, concede=-1000, touch=200, shot=700, save=300))
+
+env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=450)], reward_fn=GroupRewardFunction())
 state_size = OurObsBuilder.STATE_SIZE
 action_size = cs.CONTROL_STATES_COUNT
 
@@ -50,18 +53,17 @@ while run == 1:
       state = next_state
 
       total_reward += reward
-    
-      if episode_done:
-        agent.save_weight_as_csv("save/{}/episode/{}/".format(training_timestamp, e), "final_weights.csv")
-        
-        bhf.save_training_results_as_csv(training_timestamp, tick, total_reward, start_time)
-        
-        print("Episode {} complete.\nEpsilon: {}".format(e, agent.epsilon))
       
-      tick += 1
+      if episode_done:
+        print("episode ended at tick {}".format((tick + 1)/15))
+        bhf.save_training_results_as_csv(training_timestamp, e, tick, total_reward, start_time)
+        print("Episode {} complete.\nEpsilon: {}".format(e, agent.epsilon))
 
+      tick += 1
+    
     if len(agent.memory) > batch_size:
       agent.replay(batch_size)
+    agent.save_weight_as_csv("save/{}/episode/{}/".format(training_timestamp, e), "final_weights.csv")
 
   # save weights file after every episodes_size episodes
   agent.save("save/{}/model/end_of_training_weights.hdf5".format(training_timestamp))
