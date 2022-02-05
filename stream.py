@@ -15,7 +15,7 @@ screen_resolution = "1280x720"
 stream_resolution = "1280x720"
 
 # keep the stream_key off github please. can someone put it in the discord chat for the account we made
-ingestion_server = "rtmp://ord02.contribute.live-video.net/app"
+ingestion_server = "rtmp://dfw.contribute.live-video.net/app"
 stream_key = ""
 
 #i verified that these settings work fine, we may need to tweak them once we test this while the bot is running though
