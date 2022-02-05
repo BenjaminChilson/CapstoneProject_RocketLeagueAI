@@ -10,7 +10,7 @@ ffmpeg_installation = "C://Program Files//ffmpeg//bin"
 
 # we might have to have a monitor hooked up to the machine for this to work, but i'm not really sure.
 # i have an extra one i'm not using if we need it
-target_frame_rate = 30
+target_frame_rate = 24
 screen_resolution = "1280x720"
 stream_resolution = "1280x720"
 
