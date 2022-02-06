@@ -102,3 +102,6 @@ class DQNAgent:
       layernumber += 1
       w += 2
     f.close
+
+  def reset_epsilon(self):
+    self.epsilon = 1.0

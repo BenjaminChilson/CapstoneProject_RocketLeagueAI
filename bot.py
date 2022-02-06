@@ -32,7 +32,7 @@ while run == 1:
   if not os.path.exists("save/{}/model/".format(training_timestamp)):
     os.makedirs("save/{}/model/".format(training_timestamp))
   agent.save("save/{}/model/start_of_training_weights.hdf5".format(training_timestamp))
-  
+
   # run episodes
   for e in range(episode_size):
     start_time = datetime.now().strftime("%Y:%m:%d_%H:%M:%S")
@@ -66,3 +66,5 @@ while run == 1:
 
   # save weights file after every episodes_size episodes
   agent.save("save/{}/model/end_of_training_weights.hdf5".format(training_timestamp))
+
+  agent.reset_epsilon()
