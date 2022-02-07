@@ -50,7 +50,11 @@ while run == 1:
       
       next_state, reward, episode_done, _ = env.step(action)
 
-      agent.remember(state, action_index, reward, next_state, episode_done)
+      #this is done, because the memory of the state shouldn't include the on_ground value, similar to the state variable above
+      reduced_next_state = next_state.copy()
+      reduced_next_state.pop(OurObsBuilder.CAR_ON_GROUND_INDEX)
+
+      agent.remember(state, action_index, reward, reduced_next_state, episode_done)
 
       state = next_state
 
