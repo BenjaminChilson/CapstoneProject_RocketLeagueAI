@@ -21,39 +21,29 @@ def __get_car_on_ground_action_set_from_controller_state__(controller_state, act
     action_set[YAW_INDEX] = 0
     action_set[PITCH_INDEX] = 0
     action_set[ROLL_INDEX] = 0
-    #copy over values for jump, boost, and handbrake
+    #copy over values for jump
     action_set[JUMP_INDEX] = controller_state[cs.JUMP_INDEX]
-    action_set[BOOST_INDEX] = controller_state[cs.BOOST_INDEX]
-    action_set[HANDBRAKE_INDEX] = controller_state[cs.SHIFT_INDEX]
+    #boost and handbrake will remain at zero in all cases
+    action_set[BOOST_INDEX] = 0
+    action_set[HANDBRAKE_INDEX] = 0
 
     return action_set
 
 def __get_car_in_air_action_set_from_controller_state__(controller_state, action_set):
-    roll_activated = controller_state[cs.SHIFT_INDEX] == 1
-    roll_not_activated = not roll_activated
-
     #throttle and steer cannot be adjusted when car is in the air, equals 0
     action_set[THROTTLE_INDEX] = 0
     action_set[STEER_INDEX] = 0
     #copy Forward/Back to control pitch
     action_set[PITCH_INDEX] = controller_state[cs.FOWARDBACKWARD_INDEX]
-
-    if roll_activated:
-        #yaw cannot be altered when rolling, equals 0
-        action_set[YAW_INDEX] = 0
-        #copy Left/Right value to control roll
-        action_set[ROLL_INDEX] = controller_state[cs.LEFTRIGHT_INDEX]
-
-    elif roll_not_activated:
-        #copy Left/Right value to control yaw
-        action_set[YAW_INDEX] = controller_state[cs.LEFTRIGHT_INDEX]
-        #roll cannot be altered when roll is not activated, equals 0
-        action_set[ROLL_INDEX] = 0
+    #copy Left/Right value to control yaw
+    action_set[YAW_INDEX] = controller_state[cs.LEFTRIGHT_INDEX]
+    #roll will not be used in our current implimentation, equals 0
+    action_set[ROLL_INDEX] = 0
 
     #copy over values for jump and boost
     action_set[JUMP_INDEX] = controller_state[cs.JUMP_INDEX]
-    action_set[BOOST_INDEX] = controller_state[cs.BOOST_INDEX]
-    #handbrake cannot be used while car is not on ground, equals 0
+    #boost and handbrake will remain at zero in all cases
+    action_set[BOOST_INDEX] = 0
     action_set[HANDBRAKE_INDEX] = 0
 
     return action_set
