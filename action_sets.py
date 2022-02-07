@@ -49,10 +49,9 @@ def __get_car_in_air_action_set_from_controller_state__(controller_state, action
     return action_set
 
 
-def get_action_set_from_controller_state(controller_state, game_state):
+def get_action_set_from_controller_state(controller_state, car_on_ground: bool):
     action_set = [None] * ACTION_SET_SIZE
 
-    car_on_ground = game_state[OurObsBuilder.CAR_ON_GROUND_INDEX]
     car_in_air = not car_on_ground
 
     if car_on_ground:
