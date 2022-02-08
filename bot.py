@@ -15,13 +15,14 @@ import bot_helper_functions as bhf
 
 
 env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=450)], reward_fn=GroupRewardFunction())
-state_size = OurObsBuilder.STATE_SIZE
+obs_state_size = OurObsBuilder.STATE_SIZE
+agent_state_size = obs_state_size - 1
 action_size = cs.CONTROL_STATES_COUNT
 
 batch_size = 32
 episode_size = 100
 
-agent = DQNAgent(state_size, action_size)
+agent = DQNAgent(agent_state_size, action_size)
 
 run = 1
 while run == 1:
@@ -42,12 +43,18 @@ while run == 1:
     episode_done = False
     
     while not episode_done:
+      #removes car_on_ground value from state, not required for act() but is required for getting the action set
+      car_on_ground = state.pop(OurObsBuilder.CAR_ON_GROUND_INDEX)
       action_index = agent.act(state)
-      action = action_sets.get_action_set_from_controller_state(cs.controller_states[action_index], state)
+      action = action_sets.get_action_set_from_controller_state(cs.controller_states[action_index], car_on_ground)
       
       next_state, reward, episode_done, _ = env.step(action)
 
-      agent.remember(state, action_index, reward, next_state, episode_done)
+      #this is done, because the memory of the state shouldn't include the on_ground value, similar to the state variable above
+      reduced_next_state = next_state.copy()
+      reduced_next_state.pop(OurObsBuilder.CAR_ON_GROUND_INDEX)
+
+      agent.remember(state, action_index, reward, reduced_next_state, episode_done)
 
       state = next_state
 

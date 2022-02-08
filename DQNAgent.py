@@ -27,8 +27,8 @@ class DQNAgent:
   def _build_model(self):
 
     model = Sequential()
-    model.add(Dense(36, input_dim = self.state_size, activation='relu', name="first_hidden_layer"))
-    model.add(Dense(50, activation='relu', name="second_hidden_layer"))
+    model.add(Dense(20, input_dim = self.state_size, activation='relu', name="first_hidden_layer"))
+    model.add(Dense(25, activation='relu', name="second_hidden_layer"))
     model.add(Dense(self.action_size, activation='relu', name="output_layer"))
     model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
 
