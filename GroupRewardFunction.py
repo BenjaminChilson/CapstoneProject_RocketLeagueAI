@@ -2,7 +2,7 @@ from functools import total_ordering
 from rlgym.utils.reward_functions import RewardFunction
 from rlgym.utils.gamestates import GameState, PlayerData
 import numpy as np
-from rlgym.utils.reward_functions.common_rewards import VelocityBallToGoalReward, BallYCoordinateReward, EventReward
+from rlgym.utils.reward_functions.common_rewards import VelocityBallToGoalReward, BallYCoordinateReward, EventReward, FaceBalLReward
 from rlgym.utils.common_values import BLUE_TEAM, ORANGE_TEAM
 from OurRewardFunction import OurRewardFunction
 
@@ -10,8 +10,10 @@ class GroupRewardFunction(RewardFunction):
 
     def __init__(self):
         self.function_list = [
-            EventReward(goal=1000, concede=-1000, touch=1),
-            VelocityBallToGoalReward(2)
+            EventReward(goal=1000, concede=-1000),
+            VelocityBallToGoalReward(),
+            FaceBallReward(),
+            TouchBallReward()
             #OurRewardFunction()
         ]
 
