@@ -14,13 +14,13 @@ import action_sets
 import bot_helper_functions as bhf
 
 
-env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=450)], reward_fn=GroupRewardFunction())
-obs_state_size = OurObsBuilder.STATE_SIZE
+# tick-skip = 40 = 3 actions per second
+env = rlgym.make(game_speed=100, tick_skip=40, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=225)], reward_fn=GroupRewardFunction())obs_state_size = OurObsBuilder.STATE_SIZE
 agent_state_size = obs_state_size - 1
 action_size = cs.CONTROL_STATES_COUNT
 
-batch_size = 32
-episode_size = 100
+batch_size = 1000
+episode_size = 250
 
 agent = DQNAgent(agent_state_size, action_size)
 

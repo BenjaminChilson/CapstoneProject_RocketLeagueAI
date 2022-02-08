@@ -11,14 +11,14 @@ class DQNAgent:
     self.state_size = state_size
     self.action_size = action_size
 
-    self.memory = deque(maxlen=2000)
+    self.memory = deque(maxlen=35000)
 
     #discount factor of future rewards
     self.gamma = 0.95
     #exploration rate of agent
-    self.epsilon = 1.0
+    self.epsilon = 0.8
     self.epsilon_decay = 0.995
-    self.epsilon_min = 0.01
+    self.epsilon_min = 0.3
 
     self.learning_rate = 0.001
 
