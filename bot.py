@@ -15,7 +15,7 @@ import bot_helper_functions as bhf
 
 
 # tick-skip = 40 = 3 actions per second
-env = rlgym.make(game_speed=100, tick_skip=40, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=225)], reward_fn=GroupRewardFunction())obs_state_size = OurObsBuilder.STATE_SIZE
+rlgym.make(game_speed=100, tick_skip=30, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=225)], reward_fn=GroupRewardFunction())
 agent_state_size = obs_state_size - 1
 action_size = cs.CONTROL_STATES_COUNT
 
