@@ -12,6 +12,6 @@ class OurRewardFunction(RewardFunction):
     def get_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
         if player.team_num == BLUE_TEAM and player.car_data.position[1] < state.ball.position[1] \
             or player.team_num == ORANGE_TEAM and player.car_data.position[1] > state.ball.position[1]:
-                return 50
+                return 10
         else:
             return 0
