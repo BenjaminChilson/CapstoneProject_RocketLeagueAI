@@ -11,7 +11,7 @@ class DQNAgent:
     self.state_size = state_size
     self.action_size = action_size
 
-    self.memory = deque(maxlen=6000)
+    self.memory = deque(maxlen=5000)
 
     #discount factor of future rewards
     self.gamma = 0.95
