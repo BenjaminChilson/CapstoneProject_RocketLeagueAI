@@ -20,7 +20,7 @@ obs_state_size = OurObsBuilder.STATE_SIZE
 agent_state_size = obs_state_size - 1
 action_size = cs.CONTROL_STATES_COUNT
 
-batch_size = 1000
+batch_size = 100
 episode_size = 250
 
 agent = DQNAgent(agent_state_size, action_size)
