@@ -37,4 +37,4 @@ save = CheckpointCallback(250000, save_path="policy", name_prefix="CarBallAI")
 
 # start training, always call env.reset() before model.learn()
 env.reset()
-model.learn(total_timesteps=int(1e6), callback=save, reset_num_timesteps=False)
+model.learn(total_timesteps=int(1e8), callback=save, reset_num_timesteps=False)
