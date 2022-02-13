@@ -20,7 +20,6 @@ env = SB3SingleInstanceEnv(gym_env)
 model = PPO.load("policy/CarBallAI_100000000_steps.zip", env, device="auto", custom_objects=dict(n_envs=env.num_envs))
 
 episodes = 1000
-
 for ep in range(episodes):
     obs = env.reset()
     done = False
@@ -30,6 +29,3 @@ for ep in range(episodes):
 
         # pass action to env and get info back
         obs, rewards, done, info = env.step(action)
-
-        # show the environment on the screen
-        env.render()
