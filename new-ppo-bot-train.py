@@ -2,6 +2,7 @@ import rlgym
 
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import CheckpointCallback
+from stable_baselines3.common.vec_env import VecMonitor, VecNormalize, VecCheckNan
 
 from rlgym.utils.terminal_conditions.common_conditions import GoalScoredCondition, NoTouchTimeoutCondition, TimeoutCondition
 from rlgym.utils.reward_functions.common_rewards import VelocityBallToGoalReward, BallYCoordinateReward, EventReward, RewardIfBehindBall
@@ -15,6 +16,9 @@ from GroupRewardFunction import GroupRewardFunction
 # create the environment
 gym_env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=250), TimeoutCondition(1000)], reward_fn=GroupRewardFunction())
 env = SB3SingleInstanceEnv(gym_env)
+env = VecCheckNan(env)
+env = VecMonitor(env)
+env = VecNormalize(env, norm_obs=False, gamma=0.995)
 
 # create the model
 model = PPO(
@@ -33,7 +37,7 @@ model = PPO(
     )
 
 # used to save the model after every X amount of steps
-save = CheckpointCallback(250000, save_path="policy", name_prefix="CarBallAI")
+save = CheckpointCallback(5000000, save_path="policy", name_prefix="CarBallAI")
 
 # start training, always call env.reset() before model.learn()
 env.reset()
