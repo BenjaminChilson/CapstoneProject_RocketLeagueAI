@@ -37,7 +37,7 @@ model = PPO(
     )
 
 # used to save the model after every X amount of steps
-save = CheckpointCallback(5000000, save_path="policy", name_prefix="CarBallAI")
+save = CheckpointCallback(2500000, save_path="policy", name_prefix="CarBallAI")
 
 # start training, always call env.reset() before model.learn()
 env.reset()

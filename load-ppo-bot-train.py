@@ -21,11 +21,11 @@ env = VecMonitor(env)
 env = VecNormalize(env, norm_obs=False, gamma=0.995)
 
 # load the model
-model = PPO.load("policy/CarBallAI_100000000_steps.zip", env, device="auto", custom_objects=dict(n_envs=env.num_envs))
+model = PPO.load("policy/CarBallAI_150000000_steps.zip", env, device="auto", custom_objects=dict(n_envs=env.num_envs))
 
 # used to save the model after every X amount of steps
-save = CheckpointCallback(5000000, save_path="policy", name_prefix="CarBallAI")
+save = CheckpointCallback(2500000, save_path="policy", name_prefix="CarBallAI")
 
 # start training, always call env.reset() before model.learn()
 env.reset()
-model.learn(total_timesteps=int(1e8), callback=save, reset_num_timesteps=False)
+model.learn(total_timesteps=int(5e7), callback=save, reset_num_timesteps=False)

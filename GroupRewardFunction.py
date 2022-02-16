@@ -10,11 +10,9 @@ class GroupRewardFunction(RewardFunction):
 
     def __init__(self):
         self.function_list = [
-            EventReward(goal=1000, concede=-1000, shot=100, touch=10),
+            EventReward(goal=1000, concede=-2000, shot=300, touch=100),
             VelocityPlayerToBallReward(),
-            #FaceBallReward(),
-            VelocityBallToGoalReward(),
-            #OurRewardFunction()
+            VelocityBallToGoalReward()
         ]
 
     def reset(self, initial_state: GameState):

@@ -17,7 +17,7 @@ gym_env = rlgym.make(game_speed=1, obs_builder=OurObsBuilder(), terminal_conditi
 env = SB3SingleInstanceEnv(gym_env)
 
 # load the model
-model = PPO.load("policy/CarBallAI_100000000_steps.zip", env, device="auto", custom_objects=dict(n_envs=env.num_envs))
+model = PPO.load("policy/CarBallAI_150000000_steps.zip", env, device="auto", custom_objects=dict(n_envs=env.num_envs))
 
 episodes = 1000
 for ep in range(episodes):
