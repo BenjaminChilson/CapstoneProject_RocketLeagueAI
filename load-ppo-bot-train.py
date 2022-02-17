@@ -15,18 +15,18 @@ from sb3_log_reward import SB3CombinedLogRewardCallback, SB3CombinedLogReward
 from OurObsBuilder import OurObsBuilder
 
 # create the environment
-gym_env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=250), TimeoutCondition(1000)], 
+gym_env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=400), TimeoutCondition(4500)], 
 reward_fn=SB3CombinedLogReward
    (
        (
-           EventReward(goal=15, concede=-15, shot=0.3),
+           EventReward(goal=15, concede=-15, shot=5),
            TouchBallReward(),
            LiuDistanceBallToGoalReward(),
            LiuDistancePlayerToBallReward(),
            VelocityBallToGoalReward(),
            VelocityPlayerToBallReward()
         ),
-        (1, 0.25, 0.1, 0.1, 0.3, 0.15)
+        (1, 3, 0.015, 0.015, 6, 2)
    ))
 
 env = SB3SingleInstanceEnv(gym_env)
@@ -35,11 +35,11 @@ env = VecMonitor(env)
 env = VecNormalize(env, norm_obs=False, gamma=0.995)
 
 # load the model
-model = PPO.load("policy/CarBallAI_165000000_steps.zip", env, device="auto", custom_objects=dict(n_envs=env.num_envs))
+model = PPO.load("policy/CarBallAI_170000000_steps.zip", env, device="auto", custom_objects=dict(n_envs=env.num_envs, batch_size=62_000, n_steps=62_000))
 env.reset()
 
 # used to save the model after every X amount of steps
 save = CheckpointCallback(2_500_000, save_path="policy", name_prefix="CarBallAI")
 
 # start training, always call env.reset() before model.learn()
-model.learn(total_timesteps=int(35_000_000), callback=[save, SB3CombinedLogRewardCallback(reward_names=["event_reward", "player_touch_ball", "liu_distance_ball_to_goal", "liu_distance_player_to_ball", "velocity_ball_to_goal", "velocity_player_to_goal"])], reset_num_timesteps=False)
+model.learn(total_timesteps=int(30_000_000), callback=[save, SB3CombinedLogRewardCallback(reward_names=["event_reward", "player_touch_ball", "liu_distance_ball_to_goal", "liu_distance_player_to_ball", "velocity_ball_to_goal", "velocity_player_to_ball"])], reset_num_timesteps=False)
