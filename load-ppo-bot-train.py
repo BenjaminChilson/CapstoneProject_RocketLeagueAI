@@ -18,7 +18,9 @@ from rlgym.utils.reward_functions.common_rewards import LiuDistancePlayerToBallR
 
 
 # define rewards and weights
-weighted_rewards = SB3CombinedLogReward
+
+# reward function
+weighted_rewards = CombinedReward
 (
     (
         EventReward(goal=15, concede=-5, shot=0.1),
@@ -39,7 +41,7 @@ weighted_rewards = SB3CombinedLogReward
 )
 
 # create the environment
-gym_env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=250), TimeoutCondition(1000)], reward_fn=weighted_rewards)
+gym_env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=250), TimeoutCondition(1000)], reward_fn=combined_reward)
 env = SB3SingleInstanceEnv(gym_env)
 env = VecCheckNan(env)
 env = VecMonitor(env)
