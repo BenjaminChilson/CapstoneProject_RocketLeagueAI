@@ -39,7 +39,7 @@ model = PPO.load("policy/CarBallAI_165000000_steps.zip", env, device="auto", cus
 env.reset()
 
 # used to save the model after every X amount of steps
-save = CheckpointCallback(250_0000, save_path="policy", name_prefix="CarBallAI")
+save = CheckpointCallback(2_500_000, save_path="policy", name_prefix="CarBallAI")
 rewardCallback = SB3CombinedLogRewardCallback(reward_names=["event_reward", "player_touch_ball", "liu_distance_ball_to_goal", "liu_distance_player_to_ball", "velocity_ball_to_goal", "velocity_player_to_goal"], file_location="combinedlogfiles")
 
 # start training, always call env.reset() before model.learn()
