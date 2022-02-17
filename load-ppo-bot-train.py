@@ -41,7 +41,7 @@ weighted_rewards = CombinedReward
 )
 
 # create the environment
-gym_env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=250), TimeoutCondition(1000)], reward_fn=combined_reward)
+gym_env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=250), TimeoutCondition(1000)], reward_fn=weighted_rewards)
 env = SB3SingleInstanceEnv(gym_env)
 env = VecCheckNan(env)
 env = VecMonitor(env)
