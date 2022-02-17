@@ -20,22 +20,24 @@ from rlgym.utils.reward_functions.common_rewards import LiuDistancePlayerToBallR
 # define rewards and weights
 
 # reward function
-weighted_rewards = CombinedReward
-(
+def comb_reward():
+    weighted_rewards = CombinedReward
     (
-        EventReward(goal=15, concede=-5, shot=0.1),
-        TouchBallReward(1.5),
-        LiuDistanceBallToGoalReward(),
-        LiuDistancePlayerToBallReward(),
-        VelocityBallToGoalReward(),
-        VelocityPlayerToBallReward()
-    ),
-    
-    (1, 0.4, 0.2, 0.1, 0.5, 0.2)
-)
+        (
+            EventReward(goal=15, concede=-5, shot=0.1),
+            TouchBallReward(1.5),
+            LiuDistanceBallToGoalReward(),
+            LiuDistancePlayerToBallReward(),
+            VelocityBallToGoalReward(),
+            VelocityPlayerToBallReward()
+        ),
+        
+        (1, 0.4, 0.2, 0.1, 0.5, 0.2)
+    )
+    return weighted_rewards
 
 # create the environment
-gym_env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=250), TimeoutCondition(1000)], reward_fn=weighted_rewards)
+gym_env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=250), TimeoutCondition(1000)], reward_fn=comb_reward())
 env = SB3SingleInstanceEnv(gym_env)
 env = VecCheckNan(env)
 env = VecMonitor(env)
