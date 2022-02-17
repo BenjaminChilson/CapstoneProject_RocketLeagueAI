@@ -12,17 +12,15 @@ from rlgym_tools.sb3_utils import SB3SingleInstanceEnv
 from OurObsBuilder import OurObsBuilder
 from GroupRewardFunction import GroupRewardFunction
 
-from WeightedCombinedRewards import combined_reward
-
 # create the environment
-gym_env = rlgym.make(game_speed=1, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=250), TimeoutCondition(1000)], reward_fn=combined_reward())
+gym_env = rlgym.make(game_speed=1, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition()], reward_fn=GroupRewardFunction())
 env = SB3SingleInstanceEnv(gym_env)
 
 # load the model
 model = PPO.load("policy/CarBallAI_150000000_steps.zip", env, device="auto", custom_objects=dict(n_envs=env.num_envs))
 
-episodes = 1000
-for ep in range(episodes):
+run = 1
+while(run == 1):
     obs = env.reset()
     done = False
     while not done:
