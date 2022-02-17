@@ -13,11 +13,33 @@ from rlgym_tools.sb3_utils import SB3SingleInstanceEnv
 from OurObsBuilder import OurObsBuilder
 from GroupRewardFunction import GroupRewardFunction
 
-from WeightedCombinedRewards import combined_reward
-from sb3_log_reward import SB3CombinedLogRewardCallback
+from sb3_log_reward import SB3CombinedLogRewardCallback, SB3CombinedLogReward
+from rlgym.utils.reward_functions.common_rewards import LiuDistancePlayerToBallReward, LiuDistanceBallToGoalReward, VelocityPlayerToBallReward, VelocityBallToGoalReward, BallYCoordinateReward, EventReward, FaceBallReward, TouchBallReward
+
+
+# define rewards and weights
+weighted_rewards = SB3CombinedLogReward
+(
+    (
+        EventReward(goal=15, concede=-5, shot=0.1),
+        TouchBallReward(1.5),
+        LiuDistanceBallToGoalReward(),
+        LiuDistancePlayerToBallReward(),
+        VelocityBallToGoalReward(),
+        VelocityPlayerToBallReward(),
+    ),
+    (
+        1,
+        0.4,
+        0.2,
+        0.1,
+        0.5,
+        0.2
+    )
+)
 
 # create the environment
-gym_env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=250), TimeoutCondition(1000)], reward_fn=GroupRewardFunction())
+gym_env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=250), TimeoutCondition(1000)], reward_fn=weighted_rewards)
 env = SB3SingleInstanceEnv(gym_env)
 env = VecCheckNan(env)
 env = VecMonitor(env)
