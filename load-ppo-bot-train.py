@@ -33,4 +33,4 @@ rewardCallback = SB3CombinedLogRewardCallback(["event_reward", "player_touch_bal
 
 # start training, always call env.reset() before model.learn()
 env.reset()
-model.learn(total_timesteps=int(5e7), callback=save, reset_num_timesteps=False)
+model.learn(total_timesteps=int(35_000_000), callback=[save, rewardCallback], reset_num_timesteps=False)
