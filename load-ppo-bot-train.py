@@ -20,13 +20,13 @@ reward_fn=SB3CombinedLogReward
    (
        (
            EventReward(goal=15, concede=-15, shot=5),
-           TouchBallReward(),
+           TouchBallReward(aerial_weight=1.5),
            LiuDistanceBallToGoalReward(),
            LiuDistancePlayerToBallReward(),
            VelocityBallToGoalReward(),
            VelocityPlayerToBallReward()
         ),
-        (1, 3, 0.015, 0.015, 6, 2)
+        (1, 1, 0, 0, 0.04, 0.04)
    ))
 
 env = SB3SingleInstanceEnv(gym_env)
