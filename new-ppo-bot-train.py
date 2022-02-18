@@ -15,18 +15,19 @@ from sb3_log_reward import SB3CombinedLogRewardCallback, SB3CombinedLogReward
 from OurObsBuilder import OurObsBuilder
 
 # create the environment
-gym_env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=250), TimeoutCondition(1000)], 
+gym_env = rlgym.make(game_speed=100, obs_builder=OurObsBuilder(), terminal_conditions=[GoalScoredCondition(), NoTouchTimeoutCondition(max_steps=100)], 
 reward_fn=SB3CombinedLogReward
    (
        (
-           EventReward(goal=15, concede=-15, shot=0.3),
+           #EventReward(goal=15, concede=-15, shot=0.3),
            TouchBallReward(),
-           LiuDistanceBallToGoalReward(),
-           LiuDistancePlayerToBallReward(),
-           VelocityBallToGoalReward(),
+           #LiuDistanceBallToGoalReward(),
+           #LiuDistancePlayerToBallReward(),
+           #VelocityBallToGoalReward(),
            VelocityPlayerToBallReward()
         ),
-        (1, 0.25, 0.1, 0.1, 0.3, 0.15)
+        #(1, 0.25, 0.1, 0.1, 0.3, 0.15)
+        (1, 0.1)
    ))
 
 env = SB3SingleInstanceEnv(gym_env)
@@ -44,8 +45,8 @@ model = PPO(
         vf_coef=1.,                  # From PPO Atari
         gamma=0.995,                 # Gamma as calculated using half-life
         verbose=3,                   # Print out all the info as we're going
-        batch_size=32000,            # Batch size as high as possible within reason
-        n_steps=32000,               # Number of steps to perform before optimizing network
+        batch_size=200_000,            # Batch size as high as possible within reason
+        n_steps=200_000,               # Number of steps to perform before optimizing network
         tensorboard_log="out/logs",  # `tensorboard --logdir out/logs` in terminal to see graphs
         device="auto"                # Uses GPU if available
     )
