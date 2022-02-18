@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
     # Divide by num_envs (number of agents) because callback only increments every time all agents have taken a step
     callback = CheckpointCallback(round(2_500_000 / env.num_envs), save_path="models", name_prefix="CarBallAI-V2")
-    rewardCallback = SB3CombinedLogRewardCallback("velocity_player_to_ball", "velocity_ball_to_goal", "event_reward")
+    rewardCallback = SB3CombinedLogRewardCallback(reward_names=["velocity_player_to_ball", "velocity_ball_to_goal", "event_reward"])
 
     atexit.register(exit_save, model)
     try:
