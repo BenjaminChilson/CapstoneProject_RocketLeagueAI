@@ -57,14 +57,22 @@ if __name__ == '__main__':
                 VelocityPlayerToBallReward(),
                 VelocityBallToGoalReward(),
                 EventReward(
-                    team_goal=100.0,
-                    concede=-100.0,
-                    shot=5.0,
-                    save=30.0,
-                    demo=10.0,
+                    team_goal=100.0
                 ),
+                 EventReward(
+                    concede=-100.0
+                ),
+                EventReward(
+                    shot=5.0
+                ),
+                EventReward(
+                    save=30.0
+                ),
+                EventReward(
+                    demo=10.0
+                )              
             ),
-            (0.1, 1.0, 1.0)),
+            (0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)),
             self_play=True,
             terminal_conditions=[TimeoutCondition(fps * 300), NoTouchTimeoutCondition(fps * 20), GoalScoredCondition()],
             obs_builder=AdvancedObs(), 
@@ -82,7 +90,8 @@ if __name__ == '__main__':
         model = PPO.load(
             "models/exit_save.zip",
             env,
-            device="auto"
+            device="auto",
+            custom_objects=dict(n_envs=env.num_envs, n_epochs=10)
         )
     except:
         from torch.nn import Tanh
@@ -94,7 +103,7 @@ if __name__ == '__main__':
         model = PPO(
             MlpPolicy,
             env,
-            n_epochs=16,                 # PPO calls for multiple epochs
+            n_epochs=10,                 # PPO calls for multiple epochs
             policy_kwargs=policy_kwargs,
             learning_rate=5e-5,          # Around this is fairly common for PPO
             ent_coef=0.01,               # From PPO Atari
@@ -103,13 +112,13 @@ if __name__ == '__main__':
             verbose=3,                   # Print out all the info as we're going
             batch_size=batch_size,             # Batch size as high as possible within reason
             n_steps=steps,                # Number of steps to perform before optimizing network
-            tensorboard_log="logs",  # `tensorboard --logdir out-v2/logs` in terminal to see graphs
+            tensorboard_log="logs",  # `tensorboard --logdir logs/logs` in terminal to see graphs
             device="auto"                # Uses GPU if available
         )
 
     # Divide by num_envs (number of agents) because callback only increments every time all agents have taken a step
     callback = CheckpointCallback(round(2_500_000 / env.num_envs), save_path="models", name_prefix="CarBallAI-V2")
-    rewardCallback = SB3CombinedLogRewardCallback(reward_names=["velocity_player_to_ball", "velocity_ball_to_goal", "event_reward"])
+    rewardCallback = SB3CombinedLogRewardCallback(reward_names=["velocity_player_to_ball", "velocity_ball_to_goal", "team_goal", "opponent_goal", "shot", "save", "demolition"])
 
     atexit.register(exit_save, model)
     try:
