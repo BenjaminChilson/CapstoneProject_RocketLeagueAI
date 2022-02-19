@@ -87,14 +87,17 @@ if __name__ == '__main__':
 
     # load an existing model, or create a new one it doesn't exist
     try:
+        print("Looking for existing model ...")
         model = PPO.load(
             "models/exit_save.zip",
             env,
             device="auto",
             custom_objects=dict(n_envs=env.num_envs, n_epochs=10)
         )
+        print("Existing model found.")
     except:
         from torch.nn import Tanh
+        print("Creating new model ...")
         policy_kwargs = dict(
             activation_fn=Tanh,
             net_arch=[512, 512, dict(pi=[256, 256, 256], vf=[256, 256, 256])],
@@ -123,7 +126,7 @@ if __name__ == '__main__':
     atexit.register(exit_save, model)
     try:
         while True:
-            model.learn(25_000_000, callback=[callback, rewardCallback])
+            model.learn(25_000_000, callback=[callback, rewardCallback], reset_num_timesteps=False)
             model.save("models/exit_save")
             model.save(f"mmr_models/{model.num_timesteps}")
     except Exception as e:
