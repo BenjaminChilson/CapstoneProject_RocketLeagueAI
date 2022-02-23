@@ -49,7 +49,29 @@ if __name__ == '__main__':
             obs_builder=AdvancedObs(), 
             state_setter=DefaultState(),
             action_parser=DiscreteAction(),
-            game_speed=1
+            game_speed=1,
+            reward_function=SB3CombinedLogReward(
+            (
+                VelocityPlayerToBallReward(),
+                VelocityBallToGoalReward(),
+                EventReward(
+                    team_goal=100.0
+                ),
+                 EventReward(
+                    concede=-100.0
+                ),
+                EventReward(
+                    shot=5.0
+                ),
+                EventReward(
+                    save=30.0
+                ),
+                EventReward(
+                    demo=10.0
+                )              
+            ),
+            (0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)),
+            terminal_conditions=[]
         )
 
     env = SB3MultipleInstanceEnv(get_match, num_instances)
