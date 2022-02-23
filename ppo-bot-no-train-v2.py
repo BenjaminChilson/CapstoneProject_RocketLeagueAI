@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     fps = 120 / frame_skip
     gamma = np.exp(np.log(0.5) / (fps * half_life_seconds))
-    agents_per_match = 2
+    agents_per_match = 1
     num_instances = 1
     target_steps = 100_000
     steps = target_steps // (num_instances * agents_per_match)
