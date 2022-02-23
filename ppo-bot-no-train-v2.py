@@ -61,7 +61,8 @@ if __name__ == '__main__':
             terminal_conditions=[],
             obs_builder=AdvancedObs(), 
             state_setter=DefaultState(),
-            action_parser=DiscreteAction()
+            action_parser=DiscreteAction(),
+            game_speed=1
         )
 
     env = SB3MultipleInstanceEnv(get_match, num_instances)
