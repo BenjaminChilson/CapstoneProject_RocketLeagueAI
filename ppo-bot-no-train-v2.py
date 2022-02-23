@@ -85,13 +85,13 @@ if __name__ == '__main__':
             device="auto",
             custom_objects=dict(n_envs=env.num_envs))
 
-run = 1
-while(run == 1):
-    obs = env.reset()
-    done = False
-    while not done:
-        # pass observation to model to get predicted action
-        action, _states = model.predict(obs)
+    run = 1
+    while(run == 1):
+        obs = env.reset()
+        done = False
+        while not done:
+            # pass observation to model to get predicted action
+            action, _states = model.predict(obs)
 
-        # pass action to env and get info back
-        obs, rewards, done, info = env.step(action)
+            # pass action to env and get info back
+            obs, rewards, done, info = env.step(action)
