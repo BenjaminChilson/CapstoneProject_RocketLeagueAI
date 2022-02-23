@@ -58,7 +58,7 @@ if __name__ == '__main__':
     env = VecNormalize(env, norm_obs=False, gamma=gamma)
 
     model = PPO.load(
-            "CarBallAI-V2_100000000_steps.zip",
+            "models/CarBallAI-V2_100000000_steps.zip",
             env,
             device="auto",
             custom_objects=dict(n_envs=env.num_envs))
