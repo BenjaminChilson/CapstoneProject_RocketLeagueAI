@@ -58,7 +58,7 @@ if __name__ == '__main__':
             (0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)),
             self_play=False,
             spawn_opponents=True,
-            terminal_conditions=[],
+            terminal_conditions=[GoalScoredCondition()],
             obs_builder=AdvancedObs(), 
             state_setter=DefaultState(),
             action_parser=DiscreteAction(),
