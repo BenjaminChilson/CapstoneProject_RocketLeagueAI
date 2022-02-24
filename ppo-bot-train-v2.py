@@ -10,9 +10,9 @@ from rlgym.utils.obs_builders import AdvancedObs
 from rlgym.utils.state_setters import DefaultState
 from rlgym.utils.terminal_conditions.common_conditions import TimeoutCondition, NoTouchTimeoutCondition, GoalScoredCondition
 from rlgym_tools.sb3_utils import SB3MultipleInstanceEnv
-from rlgym_tools.extra_rewards.anneal_rewards import AnnealRewards
+from rlgym_tools.extra_rewards.anneal_rewards import AnnealRewards, _DummyReward
 from rlgym.utils.reward_functions.common_rewards.misc_rewards import EventReward
-from rlgym.utils.reward_functions.common_rewards.player_ball_rewards import VelocityPlayerToBallReward
+from rlgym.utils.reward_functions.common_rewards.player_ball_rewards import VelocityPlayerToBallReward, TouchBallReward
 from rlgym.utils.reward_functions.common_rewards.ball_goal_rewards import VelocityBallToGoalReward
 from rlgym.utils.reward_functions import CombinedReward
 
@@ -53,9 +53,7 @@ if __name__ == '__main__':
         return Match(
             team_size=1,
             tick_skip=frame_skip,
-            reward_function=AnnealRewards
-            (
-                SB3CombinedLogReward
+            reward_function=SB3CombinedLogReward
                 (
                     (
                         VelocityPlayerToBallReward(),
@@ -81,43 +79,14 @@ if __name__ == '__main__':
                             demo=10.0
                         )              
                     ),
-                        (0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+                        AnnealRewards
+                        (
+                            _DummyReward(),
+                            50_000_000,
+                            TouchBallReward()
+                        )
+                        (0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15)
                 ),
-                150_000_000, # phase out this reward between 100M to 150M. by 150m steps the second reward function is the only one in use
-                SB3CombinedLogReward
-                (
-                    (
-                        VelocityPlayerToBallReward(use_scalar_projection=True),
-                        VelocityBallToGoalReward(),
-                        EventReward
-                        (
-                            team_goal=100.0
-                        ),
-                        EventReward
-                        (
-                            concede=-100.0
-                        ),
-                        EventReward
-                        (
-                            shot=5.0
-                        ),
-                        EventReward
-                        (
-                            save=30.0
-                        ),
-                        EventReward
-                        (
-                            demo=10.0
-                        ),
-                        EventReward
-                        (
-                            touch=0.2
-                        )                
-                    ),
-                        (0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0),
-                        file_location="annealedlogfiles"
-                )
-            ),
             self_play=True,
             terminal_conditions=[TimeoutCondition(fps * 300), NoTouchTimeoutCondition(fps * 20), GoalScoredCondition()],
             obs_builder=AdvancedObs(), 
@@ -166,14 +135,12 @@ if __name__ == '__main__':
 
     # Divide by num_envs (number of agents) because callback only increments every time all agents have taken a step
     callback = CheckpointCallback(round(2_500_000 / env.num_envs), save_path="models", name_prefix="CarBallAI-V2")
-    rewardCallback = SB3CombinedLogRewardCallback(reward_names=["velocity_player_to_ball", "velocity_ball_to_goal", "team_goal", "opponent_goal", "shot", "save", "demolition"])
-    annealedrewardCallback = SB3CombinedLogRewardCallback(reward_names=["velocity_player_to_ball", "velocity_ball_to_goal", "team_goal", "opponent_goal", "shot", "save", "demolition", "ball_touch"], file_location="annealedlogfiles")
-
+    rewardCallback = SB3CombinedLogRewardCallback(reward_names=["velocity_player_to_ball", "velocity_ball_to_goal", "team_goal", "opponent_goal", "shot", "save", "demolition", "ball_touch"])
 
     atexit.register(exit_save, model)
     try:
         while True:
-            model.learn(25_000_000, callback=[callback, rewardCallback, annealedrewardCallback], reset_num_timesteps=False)
+            model.learn(25_000_000, callback=[callback, rewardCallback], reset_num_timesteps=False)
             model.save("models/exit_save")
             model.save(f"mmr_models/{model.num_timesteps}")
     except Exception as e:
