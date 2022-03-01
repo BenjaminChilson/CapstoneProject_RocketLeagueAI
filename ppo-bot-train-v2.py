@@ -77,13 +77,15 @@ if __name__ == '__main__':
                         EventReward
                         (
                             demo=10.0
-                        ), 
-                        AnnealRewards
-                        (
-                            _DummyReward(),
-                            50_000_000,
-                            TouchBallReward()
-                        ),       
+                        ),
+
+                        #AnnealRewards
+                        #(
+                         #   _DummyReward(),
+                          #  50_000_000,
+                           # TouchBallReward()
+                        #),
+                        TouchBallReward()       
                     ),
                         (0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15)
                 ),
