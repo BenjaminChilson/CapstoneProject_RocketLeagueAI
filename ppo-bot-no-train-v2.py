@@ -68,7 +68,7 @@ if __name__ == '__main__':
     env = VecNormalize(env, norm_obs=False, gamma=gamma)
 
     model = PPO.load(
-        "exit_save.zip",
+        "models/exit_save.zip",
         env,
         device="auto",
         custom_objects=dict(n_envs=env.num_envs)
