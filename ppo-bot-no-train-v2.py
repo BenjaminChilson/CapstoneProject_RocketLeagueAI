@@ -11,14 +11,12 @@ from rlgym.utils.state_setters import DefaultState
 from rlgym.utils.terminal_conditions.common_conditions import TimeoutCondition, NoTouchTimeoutCondition, GoalScoredCondition
 from rlgym_tools.sb3_utils import SB3MultipleInstanceEnv
 from rlgym.utils.reward_functions.common_rewards.misc_rewards import EventReward
-from rlgym.utils.reward_functions.common_rewards.player_ball_rewards import VelocityPlayerToBallReward
+from rlgym.utils.reward_functions.common_rewards.player_ball_rewards import VelocityPlayerToBallReward, TouchBallReward
 from rlgym.utils.reward_functions.common_rewards.ball_goal_rewards import VelocityBallToGoalReward
 from rlgym.utils.reward_functions import CombinedReward
 
 import atexit
 from torch.nn import Tanh
-from sb3_log_reward import SB3CombinedLogReward, SB3CombinedLogRewardCallback
-
 if __name__ == '__main__': 
     frame_skip = 8        
     half_life_seconds = 5 
@@ -35,7 +33,7 @@ if __name__ == '__main__':
         return Match(
             team_size=1,
             tick_skip=frame_skip,
-            reward_function=SB3CombinedLogReward(
+            reward_function=CombinedReward(
             (
                 VelocityPlayerToBallReward(),
                 VelocityBallToGoalReward(),
@@ -53,9 +51,10 @@ if __name__ == '__main__':
                 ),
                 EventReward(
                     demo=10.0
-                )              
+                ),
+                TouchBallReward()              
             ),
-            (0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)),
+            (0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15)),
             self_play=False,
             spawn_opponents=True,
             terminal_conditions=[GoalScoredCondition()],
@@ -66,12 +65,10 @@ if __name__ == '__main__':
         )
 
     env = SB3MultipleInstanceEnv(get_match, num_instances)
-    env = VecCheckNan(env)
-    env = VecMonitor(env)
     env = VecNormalize(env, norm_obs=False, gamma=gamma)
 
     model = PPO.load(
-        "models/CarBallAI-V2_100000000_steps.zip",
+        "exit_save.zip",
         env,
         device="auto",
         custom_objects=dict(n_envs=env.num_envs)
