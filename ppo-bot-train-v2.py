@@ -80,7 +80,6 @@ if __name__ == '__main__':
                         (
                             demo=10.0
                         ),
-
                         TouchBallReward(),
                         
                         # velocity towards ball during kickoff process reward
@@ -90,7 +89,7 @@ if __name__ == '__main__':
                             _DummyReward(),
                             50_000_000,
                             KickoffReward()
-                        )s
+                        )
                     ),
                         (0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15, 0.25)
                 ),
