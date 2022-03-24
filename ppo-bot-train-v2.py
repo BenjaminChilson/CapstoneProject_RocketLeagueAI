@@ -16,6 +16,8 @@ from rlgym.utils.reward_functions.common_rewards.player_ball_rewards import Velo
 from rlgym.utils.reward_functions.common_rewards.ball_goal_rewards import VelocityBallToGoalReward
 from rlgym.utils.reward_functions import CombinedReward
 
+from rlgym_tools.extra_rewards.kickoff_reward import KickoffReward
+
 import atexit
 from torch.nn import Tanh
 from sb3_log_reward import SB3CombinedLogReward, SB3CombinedLogRewardCallback
@@ -39,7 +41,7 @@ if __name__ == '__main__':
     gamma = np.exp(np.log(0.5) / (fps * half_life_seconds))
     agents_per_match = 2
     num_instances = 1
-    target_steps = 100_000
+    target_steps = 75_000
     steps = target_steps // (num_instances * agents_per_match)
     batch_size = steps
 
@@ -79,15 +81,18 @@ if __name__ == '__main__':
                             demo=10.0
                         ),
 
-                        #AnnealRewards
-                        #(
-                         #   _DummyReward(),
-                          #  50_000_000,
-                           # TouchBallReward()
-                        #),
-                        TouchBallReward()       
+                        TouchBallReward(),
+                        
+                        # velocity towards ball during kickoff process reward
+                        # annealed over 50M steps
+                        AnnealRewards
+                        (
+                            _DummyReward(),
+                            50_000_000,
+                            KickoffReward()
+                        )s
                     ),
-                        (0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15)
+                        (0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15, 0.25)
                 ),
             self_play=True,
             terminal_conditions=[TimeoutCondition(fps * 300), NoTouchTimeoutCondition(fps * 20), GoalScoredCondition()],
@@ -137,7 +142,7 @@ if __name__ == '__main__':
 
     # Divide by num_envs (number of agents) because callback only increments every time all agents have taken a step
     callback = CheckpointCallback(round(2_500_000 / env.num_envs), save_path="models", name_prefix="CarBallAI-V2")
-    rewardCallback = SB3CombinedLogRewardCallback(reward_names=["velocity_player_to_ball", "velocity_ball_to_goal", "team_goal", "opponent_goal", "shot", "save", "demolition", "ball_touch"])
+    rewardCallback = SB3CombinedLogRewardCallback(reward_names=["velocity_player_to_ball", "velocity_ball_to_goal", "team_goal", "opponent_goal", "shot", "save", "demolition", "ball_touch", "kickoff_reward"])
 
     atexit.register(exit_save, model)
     try:
