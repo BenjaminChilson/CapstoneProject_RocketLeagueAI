@@ -82,9 +82,6 @@ if __name__ == '__main__':
                             demo=10.0
                         ),
                         TouchBallReward(),
-                        
-                        # velocity towards ball during kickoff process reward
-                        # annealed over 50M steps
                         AnnealRewards
                         (
                             _DummyReward(),
@@ -113,7 +110,7 @@ if __name__ == '__main__':
             "models/exit_save.zip",
             env,
             device="auto",
-            custom_objects=dict(n_envs=env.num_envs, n_epochs=10)
+            custom_objects=dict(n_envs=env.num_envs, n_epochs=10, batch_size=75_000)
         )
         print("Existing model found.")
     except:
