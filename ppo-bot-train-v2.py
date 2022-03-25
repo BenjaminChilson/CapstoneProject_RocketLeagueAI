@@ -19,6 +19,8 @@ from rlgym.utils.reward_functions import CombinedReward
 
 from rlgym_tools.extra_rewards.kickoff_reward import KickoffReward
 
+from sb3_log_reward import SB3CombinedLogReward, SB3CombinedLogRewardCallback
+
 import atexit
 from torch.nn import Tanh
 
