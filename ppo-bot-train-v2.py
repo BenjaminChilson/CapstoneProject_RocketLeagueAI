@@ -11,7 +11,6 @@ from rlgym.utils.state_setters import DefaultState
 from rlgym.utils.terminal_conditions.common_conditions import TimeoutCondition, NoTouchTimeoutCondition, GoalScoredCondition
 from rlgym_tools.sb3_utils import SB3MultipleInstanceEnv
 from rlgym_tools.extra_rewards.anneal_rewards import AnnealRewards, _DummyReward
-from rlgym_tools.extra_rewards.kickoff_reward import KickoffReward
 from rlgym.utils.reward_functions.common_rewards.misc_rewards import EventReward
 from rlgym.utils.reward_functions.common_rewards.player_ball_rewards import VelocityPlayerToBallReward, TouchBallReward
 from rlgym.utils.reward_functions.common_rewards.ball_goal_rewards import VelocityBallToGoalReward
