@@ -81,14 +81,9 @@ if __name__ == '__main__':
                             demo=10.0
                         ),
                         TouchBallReward(),
-                        AnnealRewards
-                        (
-                            _DummyReward(),
-                            50_000_000,
-                            KickoffReward()
-                        )
+                        KickoffReward()
                     ),
-                        (0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15, 0.25)
+                        (0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15, 0.125)
                 ),
             self_play=True,
             terminal_conditions=[TimeoutCondition(fps * 300), NoTouchTimeoutCondition(fps * 20), GoalScoredCondition()],
