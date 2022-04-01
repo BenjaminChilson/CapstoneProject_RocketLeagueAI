@@ -1,5 +1,4 @@
-# RLGymExampleBot
-RLGym example bot for the RLBot framework, based on the official RLBotPythonExample
+# Carball AI RLbot
 
 ## How to use this 
 
