@@ -18,3 +18,8 @@ See https://github.com/RLBot/RLBotPythonExample/wiki for documentation and tutor
 ## Running a match
 
 You can start a match by running `run.py`, the match config for it is in `rlbot.cfg`
+
+## Extra Installations (If needed)
+Menu->Install Missing Python Packages  
+`Pickle5`  
+`rlgym`
