@@ -1,18 +1,22 @@
+import math
 import numpy as np
-from rlgym_compat import GameState
+import gym.spaces
+from rlgym_compat import PlayerData, GameState, common_values
+from parsers.action_parser import ActionParser
 
 
-class ContinuousAction:
+class ContinuousAction(ActionParser):
     """
         Simple continuous action space. Operates in the range -1 to 1, even for the binary actions which are converted back to binary later.
         This is for improved compatibility, stable baselines doesn't support tuple spaces right now.
     """
 
     def __init__(self):
-        pass
+        super().__init__()
 
-    def get_action_space(self):
-        raise NotImplementedError("We don't implement get_action_space to remove the gym dependency")
+    def get_action_space(self) -> gym.spaces.Space:
+        # return gym.spaces.Tuple((gym.spaces.Box(-1, 1, shape=(5,)), gym.spaces.MultiBinary(3)))
+        return gym.spaces.Box(-1, 1, shape=(common_values.NUM_ACTIONS,))
 
     def parse_actions(self, actions: np.ndarray, state: GameState) -> np.ndarray:
         actions = actions.reshape((-1, 8))
