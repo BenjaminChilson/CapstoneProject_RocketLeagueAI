@@ -110,3 +110,14 @@ ENV/
 # VSCode
 .vscode/
 *.code-workspace
+
+# Our Project
+/model_output
+/__pycache__
+/save
+/out
+/policy
+/combinedlogfiles
+/combinedlogfiles-v2
+/models
+/logs
